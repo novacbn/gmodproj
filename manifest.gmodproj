@@ -1,0 +1,42 @@
+Project {
+    projectName     "gmodproj"
+    projectAuthor   "NovacBN"
+
+    buildDirectory "./dist"
+    sourceDirectory "./src"
+
+    entryPoints {
+        {"gmodproj/core/ConsoleApplication", "gmodproj"}
+    }
+
+    Scripts {
+        buildDistributable (buildMode="production") ->
+            -- Check if this a production build
+            isProduction = buildMode\lower() == "production"
+
+            -- Configure the build process depending on the Operating System
+            BINARY_LUVI, BINARY_LUVIT, BINARY_UPX, BINARY_GMODPROJ = switch SYSTEM_OS_TYPE
+                when "Linux" then "./bin/luvi", "./bin/luvit", "./bin/upx", "./bin/gmodproj"
+                when "Windows" then "./bin/luvi.exe", "./bin/luvit.exe", "./bin/upx.exe", "./bin/gmodproj.exe"
+
+            -- Produce a project build of gmodproj
+            local message, status
+            if isProduction then message, status = exec "gmodproj", "build", "production"
+            else message, status = exec "gmodproj", "build"
+            return false, #message > 0 and message or "Project build of failed!" if not status or status > 1
+
+            -- Create a distributable executable with the local Luvit binaries
+            message, status = exec BINARY_LUVI, "./dist", "-m", "main.lua", "-o", BINARY_GMODPROJ, BINARY_LUVIT
+            return false, #message > 0 and message or "Binary creation failed!" if not status or status > 1
+
+            -- Compress the binary if possible
+            if isProduction
+                message, status = exec BINARY_UPX, BINARY_GMODPROJ if exists(BINARY_UPX) and isFile(BINARY_UPX)
+                return false, #message > 0 and message or "Binary compression failed!" if not status or status > 1
+
+            -- Log success!
+            return true, "Succesfully built gmodproj in #{isProduction and 'production' or 'development'} mode!"
+
+        testCommand "echo hello"
+    }
+}
