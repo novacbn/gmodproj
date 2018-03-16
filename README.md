@@ -54,10 +54,16 @@ Commands:
 
 ```
 
-## Build Requirements
+## Building From Source
+#### Prerequitises
 * `luvit` - Requires [luvit](https://luvit.io/) binaries to be present in the project's `/bin` directory.
 * `gmodproj` - Requires a pre-built version of `gmodproj`, will eventually get around to adding a non-self-hosted method.
-* (OPTIONAL) `upx` - If using `gmodproj build buildDistributable [production]` to build, it will automatically detect if [upx](https://upx.github.io/) is in the `/bin` directory and use it.
+* (OPTIONAL) `upx` - If using `gmodproj script buildDistributable [production]` to build, it will automatically detect if [upx](https://upx.github.io/) is in the `/bin` directory and use it.
+
+#### Building
+* After setting up the prerequitises, download this repository's source code into a directory.
+* Open a terminal located in the new directory and type `gmodproj script buildDistributable`.
+* When finished, a newly minted `gmodproj` _(or `gmodproj.exe` if on Windows)_ will be located in the `/bin` directory of the source code.
 
 ## Frequently Asked Questions (FAQ)
 #### Can you provide an installer for `gmodproj` instead of me mucking with things myself?

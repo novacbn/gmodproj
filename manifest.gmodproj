@@ -36,7 +36,5 @@ Project {
 
             -- Log success!
             return true, "Succesfully built gmodproj in #{isProduction and 'production' or 'development'} mode!"
-
-        testCommand "echo hello"
     }
 }
