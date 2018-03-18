@@ -36,10 +36,10 @@ export exec = (command, ...) ->
 -- Returns if the path is a directory
 export isDir = (path) ->
     fileStats = statSync(path)
-    return fileStats and fileStats.type == "directory"
+    return fileStats and fileStats.type == "directory" or false
 
 -- ::isFile(string path) -> boolean
 -- Returns if the path is a file
 export isFile = (path) ->
     fileStats = statSync(path)
-    return fileStats and fileStats.type == "file"
+    return fileStats and fileStats.type == "file" or false

@@ -1,12 +1,12 @@
 Project {
     projectName     "gmodproj"
-    projectAuthor   "NovacBN"
+    projectAuthor   "novacbn"
 
     buildDirectory "./dist"
     sourceDirectory "./src"
 
     entryPoints {
-        {"gmodproj/core/ConsoleApplication", "gmodproj"}
+        {"gmodproj/core/Application", "gmodproj"}
     }
 
     Scripts {
@@ -30,8 +30,8 @@ Project {
             return false, #message > 0 and message or "Binary creation failed!" if not status or status > 1
 
             -- Compress the binary if possible
-            if isProduction
-                message, status = exec BINARY_UPX, BINARY_GMODPROJ if exists(BINARY_UPX) and isFile(BINARY_UPX)
+            if isProduction and exists(BINARY_UPX) and isFile(BINARY_UPX)
+                message, status = exec BINARY_UPX, BINARY_GMODPROJ
                 return false, #message > 0 and message or "Binary compression failed!" if not status or status > 1
 
             -- Log success!

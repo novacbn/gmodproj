@@ -1,4 +1,4 @@
-import pcall, type from _G
+import ipairs, pairs, pcall, type from _G
 import upper from string
 
 livr = require "LIVR/Validator"
@@ -18,6 +18,30 @@ LIVR_UTILITY_RULES =
             return value
 
 livr.register_default_rules(LIVR_UTILITY_RULES)
+
+-- ::isSequentialTable(table sourceTable) -> boolean
+-- Returns if the table is a numeric non-sparse table(i.e. an array)
+export isSequentialTable = (sourceTable) ->
+    countedLength, previousIndex = 0, nil
+    for index, value in ipairs(sourceTable)
+        -- If there was a previously searched index, check if the table is sparse
+        if previousIndex
+            return false if (previousIndex - index) > 1
+
+        -- Store the previous index and increment the amount of keypairs counted
+        previousIndex   = index
+        countedLength   += 1
+
+    -- Return true if the amount of keypairs counted matches the table's length
+    return countedLength == #sourceTable
+
+-- ::isNumericTable(table sourceTable) -> boolean
+-- Returns if the keys of the table are all numeric
+export isNumericTable = (sourceTable) ->
+    for key, value in pairs(sourceTable)
+        return false unless type(key) == "number"
+
+    return true
 
 -- ::tryImport(string importName, any exportKey?) -> boolean, any | string
 -- Trys to import the given import name, if an export key is provided, it'll return that export instead of full table

@@ -1,8 +1,9 @@
 import match from string
 
+import readFileSync from require "fs"
 import gsplit from require "glue"
 
-import fromString, readFile from "gmodproj/lib/datafile"
+import fromString from "gmodproj/lib/datafile"
 import logError, logOptionsError from "gmodproj/lib/logging"
 import validateOptions from "gmodproj/lib/utilities"
 
@@ -31,8 +32,8 @@ export class ConfigurationOptions
     -- Shortcut method for reading a DataFile file
     readFile: (filePath) =>
         -- Read the datafile into memory, then parse
-        options = readFile(filePath)
-        return self(options)
+        contents = readFileSync(filePath)
+        return self\fromString(contents)
 
     -- ConfigurationOptions::new(table options?, string parentNamespace?)
     -- Sets up the options for validation

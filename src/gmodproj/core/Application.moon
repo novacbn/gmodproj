@@ -1,4 +1,4 @@
-import pcall, unpack from _G
+import unpack from _G
 import match from string
 import remove from table
 
@@ -7,18 +7,19 @@ import file, join from require "path"
 
 import ConfigurationOptions from "gmodproj/api/ConfigurationOptions"
 import Packager from "gmodproj/core/Packager"
+templates = dependency "gmodproj/core/templates"
 import
-    ENV_ALLOW_UNSAFE_SCRIPTING, PATH_DIRECTORY_CACHE, PATH_DIRECTORY_DATA, PATH_DIRECTORY_LOGS,
-    PATH_DIRECTORY_PROJECT, PATH_FILE_MANIFEST
+    APPLICATION_CORE_VERSION, ENV_ALLOW_UNSAFE_SCRIPTING, PATH_DIRECTORY_CACHE, PATH_DIRECTORY_DATA,
+    PATH_DIRECTORY_LOGS, PATH_DIRECTORY_PROJECT, PATH_FILE_MANIFEST, PATTERN_METADATA_NAME
 from "gmodproj/lib/constants"
 import ElapsedTimer from "gmodproj/lib/ElapsedTimer"
 import exec, formatCommand, isDir, isFile from "gmodproj/lib/fsx"
 import enableFileLogging, logInfo, logFatal from "gmodproj/lib/logging"
-import setEnvironment from "gmodproj/lib/scripting"
+import ScriptingEnvironment from "gmodproj/lib/scripting"
 
 -- ::TEXT_COMMAND_VERSION -> string
 -- Represents the current version of the application
-TEXT_COMMAND_VERSION = "0.1.0 Pre-alpha"
+TEXT_COMMAND_VERSION = "#{APPLICATION_CORE_VERSION[1]}.#{APPLICATION_CORE_VERSION[2]}.#{APPLICATION_CORE_VERSION[3]} Pre-alpha"
 
 -- ::TEXT_COMMAND_HELP -> string
 -- Represents the help text of the application
@@ -27,12 +28,12 @@ TEXT_COMMAND_HELP = "Garry's Mod Project Manager :: #{TEXT_COMMAND_VERSION}
 Syntax:     gmodproj [command]
 
 Examples:   gmodproj build production
-            gmodproj new addon my-project
+            gmodproj new addon novacbn my-addon
             gmodproj run prebuild
 
 Commands:
     help                            Shows this help prompt
-    new <template> <name>           Creates a new directory for your project's with a template layout
+    new <template> <author> <name>  Creates a new directory for your project's with a template layout
                                         'addon', 'gamemode', 'package'
 
     build [mode]                    Builds your project into distributable Lua files
@@ -81,20 +82,14 @@ class ProjectOptions extends ConfigurationOptions
         }
     }
 
--- ConsoleApplication::ConsoleApplication()
+-- Application::Application()
 -- Represents the console application frontend
-export class ConsoleApplication
-    -- ConsoleApplication::startupArguments -> table
+export class Application
+    -- Application::startupArguments -> table
     -- An array of arguments passed from the command line to the application
     startupArguments: nil
 
-    -- ConsoleApplication::templateMap -> table
-    -- Name mapping for each project template type
-    templateMap: {
-        --package: require("templates/PackageTemplate").PackageTemplate
-    }
-
-    -- ConsoleApplication::new(string ...)
+    -- Application::new(string ...)
     -- Sets up the console application for use
     new: (...) =>
         -- Cache the startup commands and log to file
@@ -111,7 +106,7 @@ export class ConsoleApplication
             when "version" then @commandVersion()
             else logFatal("Invalid command '#{subCommand}'!")
 
-    -- ConsoleApplication::configureEnvironment() -> void
+    -- Application::configureEnvironment() -> void
     -- Configures the environment for project building
     configureEnvironment: () =>
         -- Create the directories needed for the build process
@@ -122,12 +117,12 @@ export class ConsoleApplication
         -- Enable file logging
         enableFileLogging()
 
-    -- ConsoleApplication::nextArgument() -> string or nil
+    -- Application::nextArgument() -> string or nil
     -- Pulls the next available argument from the startup arguments
     nextArgument: () =>
         return remove(@startupArguments, 1)
 
-    -- ConsoleApplication::readManifest() -> ProjectOptions
+    -- Application::readManifest() -> ProjectOptions
     -- Reads the project's manifest file if available, otherwise uses all default values
     readManifest: () =>
         -- Validate the project's manifest then return the parsed contents
@@ -135,7 +130,7 @@ export class ConsoleApplication
         return ProjectOptions\readFile(PATH_FILE_MANIFEST) if isFile(PATH_FILE_MANIFEST)
         return ProjectOptions({})
 
-    -- ConsoleApplication::commandBuild() -> nil
+    -- Application::commandBuild() -> nil
     -- Starts building the project build output
     commandBuild: () =>
         -- Configure the application for building
@@ -153,48 +148,49 @@ export class ConsoleApplication
         logFatal("Project has no entry points for building!") if #entryPoints < 1
 
         -- Create the new packager and package up each entry point
-        packager = Packager(options\get("Project.sourceDirectory"), options\get("Project.Packager"), "Project")
+        local packager
         for packageBuild in *entryPoints
             -- Write the package entry point and notify the user
             logInfo("Building entry point '#{packageBuild[2]}'")
+            packager = Packager(options\get("Project.sourceDirectory"), options\get("Project.Packager"), "Project")
             packager\writePackage(packageBuild, options\get("Project.buildDirectory"), isProduction)
 
         -- Notify the user of completion time
         elapsedTime = elapsedTimer\getFormattedElapsed()
         logInfo("Build completed in #{elapsedTime}!")
 
-    -- ConsoleApplication::commandNew() -> nil
+    -- Application::commandNew() -> nil
     -- Creates a new project based off a template
     commandNew: () =>
         -- Retrieves the template for the project
-        templateName = @nextArgument()
+        templateName    = @nextArgument()
+        templateChunk   = templates[templateName]
+        logFatal("Invalid template '#{templateName}'!") unless templateChunk
 
-        -- Try to import an internal template, otherwise an installed package
-        success, template = tryImport("templates/#{templateName}", templateName)
-        success, template = tryImport(templateName, file(templateName)) unless success
+        -- Retrieve the author and name of the project
+        projectAuthor = @nextArgument()
+        unless projectAuthor and #projectAuthor > 0 and match(projectAuthor, PATTERN_METADATA_NAME)
+            logFatal("Project name '#{projectAuthor}' is invalid, must be lowercase alphanumeric and dashes only!")
 
-        -- If there is no template, bail on the user
-        logFatal("Template '#{templateName}' could not be imported!") unless success
-
-        -- Retrieve the name of the project
         projectName = @nextArgument()
-        logFatal("Project name '#{projectName}' is invalid, must be lowercase letters and dashes only!") unless match(projectName, "^[%l%-]+$")
+        unless projectName and #projectName > 0 and match(projectName, PATTERN_METADATA_NAME)
+            logFatal("Project name '#{projectName}' is invalid, must be lowercase alphanumeric and dashes only!")
 
-        -- Concat the new project's path and check if it exists
+        -- Validate the project's path and make the new directory
         projectPath = join(PATH_DIRECTORY_PROJECT, projectName)
-        logFatal("Project directory '#{projectName}' already exists!") if isDir(projectPath)
+        logFatal("Directory '#{projectName}' already exists!") if isDir(projectPath)
+        mkdirSync(projectPath)
 
-        -- Create a new project with the template
-        projectTemplate = template\new(projectName, projectPath)
-        projectTemplate\generate()
-
+        -- Set up the environment of the template script and execute
+        scriptingEnvironment = ScriptingEnvironment(projectPath, true)
+        scriptingEnvironment\executeChunk(templateChunk, projectAuthor, projectName, projectPath, unpack(@startupArguments))
         logInfo("Successfully generated project at: #{projectPath}")
 
-    -- ConsoleApplication::commandHelp() -> nil
+    -- Application::commandHelp() -> nil
     -- Displays the application's help text
     commandHelp: () => print(TEXT_COMMAND_HELP)
 
-    -- ConsoleApplication:commandScript() -> void
+    -- Application:commandScript() -> void
     -- Runs a specified script from the project's manifest
     commandScript: () =>
         -- Configure the application's environment
@@ -221,14 +217,15 @@ export class ConsoleApplication
             else logFatal("Unsafe scripting disabled by user!")
 
         else
-            -- Set the environment of the script function before running
-            scriptChunk         = setEnvironment(scriptContents)
-            success, message    = scriptChunk(unpack(@startupArguments))
+            -- Set up a scripting environment for the script to execute in
+            scriptingEnvironment            = ScriptingEnvironment(PATH_DIRECTORY_PROJECT, ENV_ALLOW_UNSAFE_SCRIPTING)
+            success, bailedOut, message     = scriptingEnvironment\executeChunk(scriptContents, unpack(@startupArguments))
 
             -- Log the return message of the script
-            if success == false then logFatal(message or "Script #{scriptName} failed to complete execution!")
-            elseif success == true then logInfo(message or "Script #{scriptName} finished executing!")
+            unless success then logFatal(bailedOut or "Script #{scriptName} had an error!")
+            elseif bailedOut == false then logFatal(message or "Script #{scriptName} failed to complete execution!")
+            else logInfo(message or "Script #{scriptName} finished executing!")
 
-    -- ConsoleApplication::commandVersion() -> void
+    -- Application::commandVersion() -> void
     -- Displays the current version of the application
     commandVersion: () => print(TEXT_COMMAND_VERSION)
