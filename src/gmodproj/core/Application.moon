@@ -7,6 +7,7 @@ import file, join from require "path"
 
 import ConfigurationOptions from "gmodproj/api/ConfigurationOptions"
 import Packager from "gmodproj/core/Packager"
+import Resolver from "gmodproj/core/Resolver"
 templates = dependency "gmodproj/core/templates"
 import
     APPLICATION_CORE_VERSION, ENV_ALLOW_UNSAFE_SCRIPTING, PATH_DIRECTORY_CACHE, PATH_DIRECTORY_DATA,
@@ -51,7 +52,8 @@ class ProjectOptions extends ConfigurationOptions
             projectAuthor:      "",
 
             buildDirectory:     "./dist",
-            sourceDirectory:    "./src",
+            sourceDirectory:    "./src"
+
             entryPoints:        {},
 
             Packager: {},
@@ -67,8 +69,8 @@ class ProjectOptions extends ConfigurationOptions
                 projectName:    {is: "string"}, -- TODO: validate with pattern, alphanumeric and dashes only
                 projectAuthor:  {is: "string"}, -- TODO: validate with pattern, alphanumeric and dashes only
 
-                buildDirectory:     {is: "string"},
-                sourceDirectory:    {is: "string"},
+                buildDirectory: {is: "string"}
+                sourceDirectory: {is: "string"}
 
                 entryPoints: {
                     list_of: {
@@ -77,6 +79,7 @@ class ProjectOptions extends ConfigurationOptions
                 },
 
                 Packager: {"any_object"},
+                Resolver: {"any_object"}
                 Scripts: {"any_object"} -- TODO: string and function checks values in keypairs
             }
         }
@@ -140,20 +143,27 @@ export class Application
         -- Parse the project manifest
         options = @readManifest()
 
-        -- Retrieve the production mode of this build
-        isProduction = (@nextArgument() or "development")\lower() == "production"
+        -- Retrieve the production mode of this build and cache options
+        isProduction    = (@nextArgument() or "development")\lower() == "production"
+        buildDirectory  = options\get("Project.buildDirectory")
 
         -- Require entry points for building
         entryPoints = options\get("Project.entryPoints")
         logFatal("Project has no entry points for building!") if #entryPoints < 1
 
-        -- Create the new packager and package up each entry point
+        -- Make a new Resolver for assets
+        resolver = Resolver(options\get("Project.sourceDirectory"), options\get("Project.Resolver"))
+
+        -- Loop through each provided entry point to the package
         local packager
-        for packageBuild in *entryPoints
-            -- Write the package entry point and notify the user
-            logInfo("Building entry point '#{packageBuild[2]}'")
-            packager = Packager(options\get("Project.sourceDirectory"), options\get("Project.Packager"), "Project")
-            packager\writePackage(packageBuild, options\get("Project.buildDirectory"), isProduction)
+        for entryPoint in *entryPoints
+            -- Make a new Packager for each build and write to the package
+            logInfo("Building entry point '#{entryPoint[2]}'")
+            packager = Packager(resolver, options\get("Project.Packager"))
+            packager\writePackage(entryPoint[1], join(
+                buildDirectory,
+                entryPoint[2]..".lua"
+            ), isProduction)
 
         -- Notify the user of completion time
         elapsedTime = elapsedTimer\getFormattedElapsed()

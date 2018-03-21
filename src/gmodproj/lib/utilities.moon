@@ -8,16 +8,42 @@ import merge from require "glue"
 -- Represents extra utility rules to use in LIVR validation rules
 LIVR_UTILITY_RULES =
     is: (check) =>
-        -- Preformat the error id
-        err = "NOT_#{upper(check)}"
+        if type(check) == "table"
+            -- Format the error string for log matching
+            err = "NOT_#{upper(check[1])}"
 
-        -- Return a wrapper rule checker
-        return (value) ->
-            -- If the type does not match, fail the check, otherwise return unmodified
-            return nil, err if type(value) ~= check
-            return value
+            -- Return a wrapper rule checker
+            return (value) ->
+                -- Validate that the value's type is in the listed rules
+                valueType = type(value)
+                for ruleType in *check
+                    return value if valueType == ruleType
+
+                -- Failed to validate return the error string
+                return nil, err
+        else
+            -- Format the error string for log matching
+            err = "NOT_#{upper(check)}"
+
+            -- Return a wrapper rule checker
+            return (value) ->
+                -- Validate that the value's type matches the rule
+                return value if type(value) == check
+
+                -- Failed to validate, return the error string
+                return nil, err
 
 livr.register_default_rules(LIVR_UTILITY_RULES)
+
+-- getIndex(table sourceTable, any searchValue) -> number or nil
+-- Returns the first instance index of the searched value
+export getIndex = (sourceTable, searchValue) ->
+    -- Loop through the table, filtering for the searched value
+    for index, value in ipairs(sourceTable)
+        return index if value == searchValue
+
+    -- Return nil if no index was found
+    return nil
 
 -- ::isSequentialTable(table sourceTable) -> boolean
 -- Returns if the table is a numeric non-sparse table(i.e. an array)

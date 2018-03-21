@@ -35,12 +35,9 @@ export class ConfigurationOptions
         contents = readFileSync(filePath)
         return self\fromString(contents)
 
-    -- ConfigurationOptions::new(table options?, string parentNamespace?)
-    -- Sets up the options for validation
+    -- ConfigurationOptions::new(table options?)
+    -- Constructor for ConfigurationOptions
     new: (options={}, parentNamespace) =>
-        -- Configure the namespace of the options
-        @configNamespace = "#{parentNamespace}.#{@configNamespace}" if parentNamespace
-
         -- Validate the specified options and fatally log if an error occured
         options, errors = validateOptions(options, @configurationRules, @defaultConfiguration)
         logOptionsError(@configNamespace, errors) if errors

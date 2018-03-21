@@ -9,7 +9,7 @@ import isFile from "gmodproj/lib/fsx"
 class ResolverOptions extends ConfigurationOptions
     -- ResolverOptions::configNamespace -> string
     -- Represents the namespace path of this configuration
-    configNamespace: "Resolver"
+    configNamespace: "Project.Resolver"
 
     -- ResolverOptions::defaultConfiguration -> table
     -- Represents the default configuration values of the packager type
@@ -22,43 +22,45 @@ class ResolverOptions extends ConfigurationOptions
     -- ResolverOptions::configurationRules -> table
     -- Represents a LIVR ruleset for validating the configuration
     configurationRules: {
-        searchPaths: {list_of: {is: "string"}}
+        searchPaths:        {list_of: {is: "string"}}
     }
 
 -- Resolver::Resolver()
 -- Represents the asset cache resolver
 export class Resolver
-    -- Resolver::new(string sourceDirectory, table assetTypes, table options, string parentNamespace?)
+    -- Resolver::sourceDirectory -> string
+    -- Represents the package's directory of source code
+
+    -- Resolver::new(string sourceDirectory, table options)
     -- Constructor for the package resolver
-    new: (sourceDirectory, assetTypes, options, parentNamespace) =>
-        -- Validate and provided Resolver options
-        @options = ResolverOptions(options, parentNamespace)
+    new: (sourceDirectory, options) =>
+        -- Validate the provided Resolver options
+        @options = ResolverOptions(options)
 
-        -- Cache the loaded asset types and source directory
-        @assetTypes         = assetTypes
-        @sourceDirectory    = sourceDirectory
+        -- Cache the project's source directory
+        @sourceDirectory = sourceDirectory
 
-    -- Resolver::resolveAsset(string assetName) -> Asset | nil
+    -- Resolver::resolveAsset(string assetName, table assetTypes) -> Asset or nil, string or nil
     -- Resolves the asset within either the source directory or packages directory
-    resolveAsset: (assetName) =>
+    resolveAsset: (assetName, assetTypes) =>
         -- Cache to reduce lookup times
         searchPaths     = @options\get("searchPaths")
         sourceDirectory = @sourceDirectory
 
         -- Loop through each registered asset type
         local assetFile, assetPath, searchPath
-        for assetExtension, assetType in pairs(@assetTypes)
+        for assetExtension, assetType in pairs(assetTypes)
             -- Append the asset type's extension
             assetFile = "#{assetName}.#{assetExtension}"
 
             -- Return a new Asset instance if it is in the source directory
             assetPath = join(sourceDirectory, assetFile)
-            return assetType(assetName, assetPath) if isFile(assetPath)
+            return assetType, assetPath if isFile(assetPath)
 
-            -- Repeat with the remaining search pathes
+            -- Repeat with the remaining search paths
             for searchPath in *searchPaths
                 assetPath = join(searchPath, assetFile)
-                return assetType(assetName, assetPath) if isFile(assetPath)
+                return assetType, assetPath if isFile(assetPath)
 
         -- Return nothing since no asset was found
-        return nil
+        return nil, nil

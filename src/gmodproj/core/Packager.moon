@@ -1,14 +1,12 @@
 import open from io
-import format from string
-import insert, remove from table
 
-import basename, join from require "path"
+import basename from require "path"
 
 dependency "gmodproj/core/plugins/BuiltinPlugin" -- HAAACKY MCHACKS: this is so the built-in plugin is included within the build
 import ConfigurationOptions from "gmodproj/api/ConfigurationOptions"
-import Resolver from "gmodproj/core/Resolver"
 import logInfo, logFatal from "gmodproj/lib/logging"
 import tryImport from "gmodproj/lib/utilities"
+import Set from "gmodproj/lib/collections/Set"
 
 -- ::TEMPLATE_PACKAGE_HEADER -> template
 -- Header project build code for managing virtual dependencies
@@ -76,7 +74,7 @@ TEMPLATE_PACKAGE_FOOTER = () -> "}, ...)"
 class PackagerOptions extends ConfigurationOptions
     -- PackagerOptions::configNamespace -> string
     -- Represents the namespace path of this configuration
-    configNamespace: "Packager"
+    configNamespace: "Project.Packager"
 
     -- PackagerOptions::defaultConfiguration -> table
     -- Represents the default configuration values of the packager type
@@ -85,9 +83,7 @@ class PackagerOptions extends ConfigurationOptions
 
         Plugins: {
             "gmodproj/core/plugins/BuiltinPlugin": {}
-        },
-
-        Resolver: {}
+        }
     }
 
     -- PackagerOptions::configurationRules -> table
@@ -95,24 +91,33 @@ class PackagerOptions extends ConfigurationOptions
     configurationRules: {
         minifyProduction: {is: "boolean"},
 
-        Plugins: {"any_object"},
-        Resolver: {"any_object"}
+        Plugins: {"any_object"}
     }
 
 -- Packager::Packager()
 -- Represents a generic Lua output build packager
 export class Packager
-    -- Packager::new(string sourceDirectory, table option, string parentNamespace?)
+    -- Packager::assetTypes -> table
+    -- Represents the registered Asset classes used for packaging
+    assetTypes: nil
+
+    -- Packager::pendingAssets -> Set
+    -- Represents the assets pending to be packaged into the build
+    pendingAssets: nil
+
+    -- Packager::resolver -> Resolver
+    -- Represents the resolver used during the packaging process
+    resolver: nil
+
+    -- Packager::new(Resolver resolver, table options?)
     -- Creates the new project manager
-    new: (sourceDirectory, options, parentNamespace) =>
+    new: (resolver, options) =>
         -- Validate the user-provided packager configuration
-        @options = PackagerOptions(options, parentNamespace)
+        @options = PackagerOptions(options)
 
         -- Initialize the class variables
-        @assetTypes         = {}
-        @dependentAssets    = {}
-        @loadedAssets       = {}
-        @loadedPlugins      = {}
+        @assetTypes     = {}
+        @loadedPlugins  = {}
 
         -- Loop through the provided plugins and initialize them
         local pluginClass
@@ -128,51 +133,47 @@ export class Packager
         for pluginName, plugin in pairs(@loadedPlugins)
             plugin\registerExtensions(self) -- seems redundent, maybe move to Plugin class' new method
 
-        -- Make a new resolver with the loaded asset types
-        @resolver = Resolver(sourceDirectory, @assetTypes, @options\get("Resolver"), "#{parentNamespace}.#{PackagerOptions.configNamespace}")
+        -- Cache the provided resolver
+        @resolver = resolver
 
-    -- Project::writePackage(table packageBuild, string buildDirectory,  boolean isProduction) -> nil
+    -- Project::writePackage(string entryPoint, string endPoint, boolean isProduction) -> nil
     -- Writes the build package to disk
-    writePackage: (packageBuild, buildDirectory, isProduction) =>
+    writePackage: (entryPoint, endPoint, isProduction) =>
         -- Open the package build and write the package header
-        handle = open(join(buildDirectory, packageBuild[2]..".lua"), "wb")
-        handle\write(TEMPLATE_PACKAGE_HEADER(packageBuild[1]).."\n")
+        handle = open(endPoint, "wb")
+        handle\write(TEMPLATE_PACKAGE_HEADER(entryPoint).."\n")
 
-        -- Add the entry point and loop through the added dependencies
-        @addDependency(packageBuild[1])
-        dependentAssets = @dependentAssets
-        local assetName, assetType, contents
-        while #dependentAssets > 0
-            -- Resolve the next asset and assert its validity
-            assetName = remove(@dependentAssets, 1)
-            unless @loadedAssets[assetName]
-                loadedAsset = @resolver\resolveAsset(assetName)
-                logFatal("asset '#{assetName}' not found!") unless loadedAsset
+        -- Make fresh set of dependencies and add the entry point
+        @pendingAssets = Set()
+        @addDependency(entryPoint)
 
-                -- Read the asset into memory then parse dependent assets
-                loadedAsset\readAsset()
-                @addDependency(assetName) for assetName in *loadedAsset.assetData.metadata.dependencies
+        -- Loop through each asset pending for packaging
+        local assetType, assetPath, loadedAsset
+        for _, assetName in @pendingAssets\iter()
+            -- Resolve the asset and validate it
+            assetType, assetPath = @resolver\resolveAsset(assetName, @assetTypes)
+            logFatal("Asset '#{assetName}' not found!") unless assetType
 
-                -- Add asset to package build and log out
-                handle\write(TEMPLATE_PACKAGE_MODULE(
-                    assetName, loadedAsset.assetData.contents
-                )..",\n")
+            -- Read and transform the asset into a module to package it
+            loadedAsset = assetType(assetName, assetPath, self)
+            handle\write(TEMPLATE_PACKAGE_MODULE(
+                assetName, loadedAsset\readAsset()
+            )..",\n")
 
-                @loadedAssets[assetName] = true
-                logInfo("\t...resolved asset '#{assetName}'")
+            logInfo("\t...resolved asset '#{assetName}'")
 
         -- Write the package footer and close the file
         handle\write(TEMPLATE_PACKAGE_FOOTER())
         handle\close()
 
     -- Packager::addDependency(string assetName) -> void
-    -- Adds a dependency to be added in the build process
+    -- Adds an asset to be processed in the build process
     addDependency: (assetName) =>
-        -- Insert the dependent asset if it wasn't already
-        insert(@dependentAssets, assetName) unless @loadedAssets[assetName]
+        -- Add the asset to the dependency Set
+        @pendingAssets\add(assetName)
 
     -- Packager::registerAsset(string assetExtension, Asset assetType) -> void
-    -- Registers an asset type with the active packager
+    -- Registers an asset type with the Packager
     registerAsset: (assetExtension, assetType) =>
         -- TODO:
         --  base class checking

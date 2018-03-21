@@ -22,7 +22,7 @@ export class MoonAsset extends LuaAsset
     transformImports: (contents) =>
         -- If the MoonScript has import statements, convert then
         if match(contents, PATTERN_HAS_IMPORTS)
-            contents = gsub(contents, PATTERN_EXTRACT_IMPORTS, (importStatement, assetName) ->
+            return gsub(contents, PATTERN_EXTRACT_IMPORTS, (importStatement, assetName) ->
                 -- Append the new source of import to the statement
                 return importStatement.."dependency(#{assetName})"
             )

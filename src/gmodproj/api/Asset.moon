@@ -7,50 +7,93 @@ import decode, encode from require "json"
 import PATH_DIRECTORY_CACHE from "gmodproj/lib/constants"
 import hashSHA1 from "gmodproj/lib/digests"
 import isFile from "gmodproj/lib/fsx"
+import Set from "gmodproj/lib/collections/Set"
 
 -- Asset::Asset()
 -- Represents a generic asset type
 export class Asset
-    -- Asset::new(string assetName, string assetPath)
+    -- Asset:assetData -> table
+    -- Represents a generic table of data related to the Asset that will be serialized
+    assetData: nil
+
+    -- Asset::assetName -> string
+    -- Represents the import name of the Asset
+    assetName: nil
+
+    -- Asset::assetPath -> string
+    -- Represents the canonical file path of the Asset
+    assetPath: nil
+
+    -- Asset::cachePath -> string
+    -- Represents the canonical file path of the Asset within the project's cache
+    cachePath: nil
+
+    -- Asset::packager -> Packager
+    -- Represents the running Packager that the Asset belongs to
+    packager: nil
+
+    -- Asset::new(string assetName, string assetPath, Packager packager)
     -- Constructor for Asset
-    new: (assetName, assetPath) =>
-        -- Cache the name and path of the asset
+    new: (assetName, assetPath, packager) =>
+        -- Cache the provided arguments
+        @assetData  = {}
         @assetName  = assetName
         @assetPath  = assetPath
         @cachePath  = join(PATH_DIRECTORY_CACHE, hashSHA1(assetName))
+        @packager   = packager
 
-    -- Asset::readAsset(boolean isProduction) -> void
-    -- Reads an asset into memory and parses it for metadata and transformations
+        -- Create the default dummy asset data
+        @assetData = {
+            metadata: {}
+        }
+
+    -- Asset::readAsset(boolean isProduction) -> string
+    -- Reads an asset into memory and processes it with transformations and metadata collection
     readAsset: (isProduction) =>
         -- Read the current cached asset data into memory or use dummy data
-        assetData = {}
-        if isFile(@cachePath) then assetData = decode(readFileSync(@cachePath))
+        if isFile(@cachePath) then @assetData = decode(readFileSync(@cachePath))
 
-        -- The current asset cache is stale, regenerate it
+        -- If the current asset cache is stale, regenerate it
         modificationTime = statSync(@assetPath).mtime.sec
-        unless assetData.path == @assetPath and assetData.mtime == modificationTime
+        unless @assetData.path == @assetPath and @assetData.mtime == modificationTime
             -- Read the contents of the asset into memory, then pre-collection transform it
             contents    = readFileSync(@assetPath)
             contents    = @preTransform(contents, isProduction)
 
-            -- Regenerate the asset data before caching
-            assetData.metadata = @collectMetadata(contents)
-            assetData.contents = @postTransform(contents, isProduction)
-            assetData.path     = @assetPath
-            assetData.mtime    = modificationTime
+            -- Collect the metadata of the asset before saving to cache
+            @collectDependencies(contents)
+
+            -- Regenerate the asset for future incremental builds
+            @assetData.contents = @postTransform(contents, isProduction)
+            @assetData.path     = @assetPath
+            @assetData.mtime    = modificationTime
+
+            @assetData.metadata.dependencies = @assetData.metadata.dependencies\values() if @assetData.metadata.dependencies
 
             -- Write the new asset data to disk cache
-            writeFileSync(@cachePath, encode(assetData))
+            writeFileSync(@cachePath, encode(@assetData))
 
-        -- Cache the new data for external access
-        @assetData = assetData
+        else
+            -- If the asset isn't stale, add the required metadata to the running Packager
+            if @assetData.metadata.dependencies
+                @packager\addDependency(assetName) for assetName in *@assetData.metadata.dependencies
 
-    -- Asset::collectMetadata(string contents) -> table
-    -- Traverses the asset to collect metadata, e.g. documentation, dependencies
-    collectMetadata: (contents) => {
-        dependencies:   {},
-        documentation:  {}
-    }
+        -- Return the contents of the asset for processing
+        return @assetData.contents
+
+    -- Asset::addDependency(string assetName) -> void
+    -- Adds the asset to the asset and packager
+    addDependency: (assetName) =>
+        -- If the asset does not currently have a dependency table, make it
+        @assetData.metadata.dependencies = Set() unless @assetData.metadata.dependencies
+
+        -- Add the dependency to the asset's metadata and packager
+        @assetData.metadata.dependencies\add(assetName)
+        @packager\addDependency(assetName)
+
+    -- Asset::collectDependencies(string contents) -> void
+    -- Traverses the asset to collect dependencies of the asset
+    collectDependencies: (contents) =>
 
     -- Asset::preTransform(string contents, boolean isProduction) -> string
     -- Transforms the asset before collecting the metadata
