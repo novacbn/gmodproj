@@ -1,5 +1,5 @@
 local unpack
-unpack = require("moonscript.util").unpack
+unpack = require("moonscript/util").unpack
 local parse_spec
 parse_spec = function(spec)
   local flags, words

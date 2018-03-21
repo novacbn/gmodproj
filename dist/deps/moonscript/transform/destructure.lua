@@ -1,16 +1,16 @@
 local ntype, mtype, build
 do
-  local _obj_0 = require("moonscript.types")
+  local _obj_0 = require("moonscript/types")
   ntype, mtype, build = _obj_0.ntype, _obj_0.mtype, _obj_0.build
 end
 local NameProxy
-NameProxy = require("moonscript.transform.names").NameProxy
+NameProxy = require("moonscript/transform/names").NameProxy
 local insert
 insert = table.insert
 local unpack
-unpack = require("moonscript.util").unpack
+unpack = require("moonscript/util").unpack
 local user_error
-user_error = require("moonscript.errors").user_error
+user_error = require("moonscript/errors").user_error
 local join
 join = function(...)
   do
