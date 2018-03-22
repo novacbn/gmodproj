@@ -1,11 +1,9 @@
-import ipairs, unpack from _G
-import open from io
-import execute, tmpname from os
+import ipairs from _G
+import open, popen from io
 import match from string
 import concat, insert from table
 
-import readFileSync, statSync from require "fs"
-import pack from require "glue"
+import statSync from require "fs"
 
 -- ::formatCommand(string ...) -> string
 -- Formats the string vararg provided into a proper command string, quoting any arguments with spaces
@@ -19,18 +17,21 @@ export formatCommand = (...) ->
     -- Return concatenate the command arguments by space
     return concat(commandArguments, " ")
 
--- ::exec(string command, string ...) -> string, number or nil
--- Executes the command and returns the resulting STDOUT and return code
-export exec = (command, ...) ->
-    -- Construct the command and execute
-    logFile         = tmpname()
-    execArguments   = pack(...)
-    insert(execArguments, ">")
-    insert(execArguments, logFile)
-    success, _, status = execute(command.." "..formatCommand(unpack(execArguments)))
+-- ::exec(string command) -> boolean, number or nil, string or nil
+-- Executes the command, returning the status code and stdout
+export exec = (command) ->
+    -- Open the process and return the output
+    -- NOTE: Luvit is compiled to return the sigterm and status with io.popen
+    handle              = popen(command, "r")
+    stdout              = handle\read("*a")
+    success, _, status  = handle\close()
+    return success, status, stdout
 
-    -- Return the command STDOUT and status
-    return readFileSync(logFile), success and status
+-- ::execFormat(string ...) -> boolean, number or nil, string or nil
+-- Executes the command, formatting the arguments together, returning the status code and stdout
+export execFormat = (...) ->
+    -- Format the arguments and execute the command
+    return exec(formatCommand(...))
 
 -- ::isDir(string path) -> boolean
 -- Returns if the path is a directory

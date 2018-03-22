@@ -3,7 +3,7 @@
 import pairs, tostring, type from _G
 import getinfo from debug
 import open from io
-import date, exit from os
+import date from os
 import format from string
 import insert from table
 
@@ -24,6 +24,7 @@ HANDLE_CURRENT_LOG = nil
 OPTIONS_ERROR_LOOKUP =
     NOT_STRING:     "expected string value"
     NOT_BOOLEAN:    "expected boolean value"
+    WRONG_FORMAT:   "option did not match pattern"
 
 -- ::fileMemoryLog -> table or nil
 -- Represents a table of string lines cached in-memory until file logging is enabled
@@ -64,7 +65,7 @@ makeLogger = (level, levelColor, defaultFile, defaultConsole, traceMessage, bail
             else HANDLE_CURRENT_LOG\write(fileLog)
 
         -- If this log level needs to bail the process, use the provided status code
-        exit(statusCode) if bailProcess
+        process\exit(statusCode) if bailProcess
 
 export enableFileLogging = () ->
     -- Only enable if not previously enabled
@@ -110,4 +111,4 @@ export logOptionsError = (parentName, errors, firstUse=true) ->
                 else logOptionsError("#{name}", id, false)
 
     -- Finally write a fatal log message
-    logFatal("There was an error processing your project configuration!") if firstUse
+    logFatal("There was an error processing your project's manifest!") if firstUse

@@ -14,7 +14,7 @@ import isAbsolute, join from require "path"
 
 import SYSTEM_OS_ARCH, SYSTEM_OS_TYPE from "gmodproj/lib/constants"
 import fromString, toString from "gmodproj/lib/datafile"
-import exec, isDir, isFile from "gmodproj/lib/fsx"
+import exec, execFormat, isDir, isFile from "gmodproj/lib/fsx"
 
 -- ChunkEnvironment::ChunkEnvironment(string environmentRoot, boolean allowUnsafe)
 -- Represents a primitive pseudo-sandboxed scripting environment
@@ -171,10 +171,14 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
         -- scripting, unsafe
         require: require
 
-        -- environmentTable::exec(string ...) -> string, number or nil
+        -- environmentTable::exec(string command) -> boolean, number or nil, string or nil
         -- Executes the shell command if shell and returns the STDOUT and status code
         -- scripting, unsafe
-        exec: (...) -> exec(...)
+        exec: exec
+
+        -- environmentTable::execFormat(string ...) -> boolean, number or nil, string or nil
+        -- Executes the shell command if shell and returns the STDOUT and status code, formatting the vararg
+        execFormat: execFormat
     })
 
     return setmetatable({}, {__index: environmentTable})

@@ -3,16 +3,15 @@ import arch, os from jit
 
 import join from require "path"
 
+import parseUserBoolean from "gmodproj/lib/utilities"
+
 -- ::APPLICATION_CORE_VERSION -> table
 -- Represents the current version of the application
-export APPLICATION_CORE_VERSION = {0, 1, 0}
+export APPLICATION_CORE_VERSION = {0, 2, 0}
 
 -- ::ENV_ALLOW_UNSAFE_SCRIPTING -> boolean
 -- Represents a environment variable flag if gmodproj should allow unsafe scripting
-export ENV_ALLOW_UNSAFE_SCRIPTING = switch getenv("GMODPROJ_ALLOW_UNSAFE_SCRIPTING")
-                                        when "no" then false
-                                        else true
---when "no" or "n" or "0" or "f" or "false" then false
+export ENV_ALLOW_UNSAFE_SCRIPTING = parseUserBoolean(getenv("GMODPROJ_ALLOW_UNSAFE_SCRIPTING") or "y")
 
 -- ::PATH_DIRECTORY_PROJECT -> string
 -- Represents the project directory

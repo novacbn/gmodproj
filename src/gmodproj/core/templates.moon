@@ -96,8 +96,7 @@ export addon = (projectAuthor, projectName, projectPath) ->
             projectAuthor:  projectAuthor
             projectName:    projectName,
 
-            buildDirectory:     "addons/#{projectName}/lua",
-            sourceDirectory:    "src",
+            buildDirectory: "addons/#{projectName}/lua"
 
             entryPoints: {
                 {"client", "autorun/client/#{projectName}.client"},
@@ -141,8 +140,7 @@ export gamemode = (projectAuthor, projectName, projectPath) ->
             projectAuthor:  projectAuthor
             projectName:    projectName,
 
-            buildDirectory:     "gamemodes/#{projectName}/gamemode",
-            sourceDirectory:    "src",
+            buildDirectory: "gamemodes/#{projectName}/gamemode"
 
             entryPoints: {
                 {"client", "#{projectName}.client"},
@@ -167,10 +165,7 @@ export package = (projectAuthor, projectName, projectPath) ->
     writeDataFile("manifest.gmodproj", {
         Project: {
             projectAuthor:  projectAuthor
-            projectName:    projectName,
-
-            buildDirectory:     "dist",
-            sourceDirectory:    "src",
+            projectName:    projectName
 
             entryPoints: {
                 {"main", "#{projectAuthor}.#{projectName}"}

@@ -14,7 +14,7 @@ import
     PATH_DIRECTORY_LOGS, PATH_DIRECTORY_PROJECT, PATH_FILE_MANIFEST, PATTERN_METADATA_NAME
 from "gmodproj/lib/constants"
 import ElapsedTimer from "gmodproj/lib/ElapsedTimer"
-import exec, formatCommand, isDir, isFile from "gmodproj/lib/fsx"
+import exec, execFormat, formatCommand, isDir, isFile from "gmodproj/lib/fsx"
 import enableFileLogging, logInfo, logFatal from "gmodproj/lib/logging"
 import ScriptingEnvironment from "gmodproj/lib/scripting"
 
@@ -48,13 +48,8 @@ class ProjectOptions extends ConfigurationOptions
     -- Represents the default configuration values
     defaultConfiguration: {
         Project: {
-            projectName:        "",
-            projectAuthor:      "",
-
             buildDirectory:     "./dist",
             sourceDirectory:    "./src"
-
-            entryPoints:        {},
 
             Packager: {},
             Scripts: {}
@@ -66,8 +61,8 @@ class ProjectOptions extends ConfigurationOptions
     configurationRules: {
         Project: {
             nested_object: {
-                projectName:    {is: "string"}, -- TODO: validate with pattern, alphanumeric and dashes only
-                projectAuthor:  {is: "string"}, -- TODO: validate with pattern, alphanumeric and dashes only
+                projectName:    {is: "string", like: PATTERN_METADATA_NAME},
+                projectAuthor:  {is: "string", like: PATTERN_METADATA_NAME},
 
                 buildDirectory: {is: "string"}
                 sourceDirectory: {is: "string"}
@@ -151,15 +146,14 @@ export class Application
         entryPoints = options\get("Project.entryPoints")
         logFatal("Project has no entry points for building!") if #entryPoints < 1
 
-        -- Make a new Resolver for assets
+        -- Make a new Resolver and Packager for building
         resolver = Resolver(options\get("Project.sourceDirectory"), options\get("Project.Resolver"))
+        packager = Packager(resolver, options\get("Project.Packager"))
 
         -- Loop through each provided entry point to the package
-        local packager
         for entryPoint in *entryPoints
             -- Make a new Packager for each build and write to the package
             logInfo("Building entry point '#{entryPoint[2]}'")
-            packager = Packager(resolver, options\get("Project.Packager"))
             packager\writePackage(entryPoint[1], join(
                 buildDirectory,
                 entryPoint[2]..".lua"
@@ -219,21 +213,21 @@ export class Application
             -- Check if unsafe scripting is allowed
             if ENV_ALLOW_UNSAFE_SCRIPTING
                 -- Execute the command, format message based on execution success
-                message, status = exec(scriptContents)
-                if status == 0 then logInfo("Successfully executed '#{scriptContents}':\n#{message}")
-                else logFatal("Could not execute '#{scriptContents}: (#{status})\n#{message}'")
+                success, status, stdout = exec(scriptContents)
+                if success then logInfo("Successfully executed '#{scriptContents}': (#{status})\n#{stdout}")
+                else logFatal("Could not execute '#{scriptContents}': (#{status})\n#{stdout}'")
 
             -- Alert that unsafe scripting was disabled and bail
             else logFatal("Unsafe scripting disabled by user!")
 
         else
             -- Set up a scripting environment for the script to execute in
-            scriptingEnvironment            = ScriptingEnvironment(PATH_DIRECTORY_PROJECT, ENV_ALLOW_UNSAFE_SCRIPTING)
-            success, bailedOut, message     = scriptingEnvironment\executeChunk(scriptContents, unpack(@startupArguments))
+            scriptingEnvironment        = ScriptingEnvironment(PATH_DIRECTORY_PROJECT, ENV_ALLOW_UNSAFE_SCRIPTING)
+            success, status, message    = scriptingEnvironment\executeChunk(scriptContents, unpack(@startupArguments))
 
             -- Log the return message of the script
-            unless success then logFatal(bailedOut or "Script #{scriptName} had an error!")
-            elseif bailedOut == false then logFatal(message or "Script #{scriptName} failed to complete execution!")
+            unless success then logFatal("Script #{scriptName} had an error:\n#{status}")
+            elseif status ~= 0 then logFatal(message or "Script #{scriptName} failed to complete execution!", nil, nil, status)
             else logInfo(message or "Script #{scriptName} finished executing!")
 
     -- Application::commandVersion() -> void
