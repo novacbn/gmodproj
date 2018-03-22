@@ -12,53 +12,59 @@
 * The API for extending `gmodproj` with installable packages is also not standardized, so any current extensions may also break.
 
 With that said however, `gmodproj` does support these features:
-* Creating new projects with `gmodproj new`, allowing you to quickly bootstrap various types of Garry's Mod projects without boilerplate. **_(currently needs refactoring!)_**
-* Projects can be built with `gmodproj build <development/production>` into self-contained distributable `.lua` files. **_(`gmodproj` is self-hosted as an example)_**
+* Creating new projects with `gmodproj new`, allowing you to quickly bootstrap various types of Garry's Mod projects without boilerplate or configuration.
+* Projects can be built with `gmodproj build [development/production]` into self-contained distributable `.lua` files. **_(`gmodproj` is self-hosted as an example)_**
+    * Builds are also incremental, no rebuilding the entire project slowing down the process.
 * A per-package `packages` folder that allows your to seperate your external dependencies with your internal ones.
     * You can also specifiy more search paths for packages in your project's manifest!
 * Run `MoonScript` code as defined in your project's `manifest.gmodproj` for task automation.
     * You can also define your scripts as strings instead of function bodies, they will be ran in your Operating System's shell scripting interpreter.
 
 ## Getting Started
-First you need to grab the latest release from the [Releases Page](releases/latest) and unpack it somewhere that your PATH environmental variable is set up to see.
+First you need to grab the latest release from the [Releases Page](releases/latest) and place the binary somewhere within PATH environmental variable is set up to see.
 
 #### Setting up an Addon project
-##### _`new` COMMAND IS CURRENTLY BROKEN_
 1. In a terminal goto the parent directory of where you would like to make your project reside, e.g. `/home/USERNAME/Workspace`
-2. Create a new folder with the `addon` template using, `gmodproj new addon MyProject`.
-3. Goto your newly created `MyProject` folder and start programming, using the `client.lua` and `server.lua` files as the entry points of your addon.
-4. Once finished, navigate to your project's root folder, type `gmodproj build`. Which will build your project to `[PROJECTROOT]/addons/lua/autorun/client/MyProject.lua` and `[PROJECTROOT]/addons/lua/autorun/server/MyProject.lua`
-5. Copy the `addons` folder into your Garry's Mod Client or SRCDS Server's `garrysmod` folder, and then start up your game.
+2. Create a new project with the `addon` template using, `gmodproj new addon my-name my-gamemode`.
+3. Goto your newly created `my-project` directory and start programming, using the `src/client.lua` and `src/server.lua`.
+4. Once finished, navigate to your project's directory with your terminal, type `gmodproj build`. Which will build your project to `addons/lua/autorun/client/my-project.client.lua` and `addons/lua/autorun/server/my-project.server.lua`
+5. Copy the `addons` directory into your Garry's Mod Client or SRCDS Server's `garrysmod` directory, and then start up your game.
+6. You're done and can continue program and debug using this routine.
+
+#### Setting up a Gamemode project
+1. In a terminal goto the parent directory of where you would like to make your project reside, e.g. `/home/USERNAME/Workspace`
+2. Create a new project with the `gamemode` template using, `gmodproj new gamemode my-name my-gamemode`.
+3. Goto your newly created `my-project` directory and start programming, using the `src/client.lua` and `src/server.lua`.
+4. Once finished, navigate to your project's directory with your terminal, type `gmodproj build`. Which will build your project to `gamemodes/my-project/gamemode/my-project.client.lua` and `gamemodes/myproject/gamemode/my-project.server.lua`
+5. Copy the `gamemodes` directory into your Garry's Mod Client or SRCDS Server's `garrysmod` directory, and then start up your game.
 6. You're done and can continue program and debug using this routine.
 
 ## CLI Options
 ```shell
 novacbn@lunasol$ gmodproj help
-
-Garry's Mod Project Manager :: 0.1.0 Pre-alpha
+Garry's Mod Project Manager :: 0.2.0 Pre-alpha
 
 Syntax:     gmodproj [command]
 
 Examples:   gmodproj build production
-            gmodproj new addon my-project
+            gmodproj new addon novacbn my-addon
             gmodproj run prebuild
 
 Commands:
     help                            Shows this help prompt
-    new <template> <name>           Creates a new directory for your project's with a template layout
+    new <template> <author> <name>  Creates a new directory for your project's with a template layout
                                         'addon', 'gamemode', 'package'
 
     build [mode]                    Builds your project into distributable Lua files
                                         (DEFAULT) 'development', 'production'
     script <script>                 Runs a specified script from your project manifest's 'Scripts'
-
 ```
 
 ## Building From Source
 #### Prerequitises
 * `luvit` - Requires [luvit](https://luvit.io/) binaries to be present in the project's `/bin` directory.
 * `gmodproj` - Requires a pre-built version of `gmodproj`, will eventually get around to adding a non-self-hosted method.
-* (OPTIONAL) `upx` - If using `gmodproj script buildDistributable [production]` to build, it will automatically detect if [upx](https://upx.github.io/) is in the `/bin` directory and use it.
+* **_(OPTIONAL)_** `upx` - If using `gmodproj script buildDistributable [production]` to build, it will automatically detect if [upx](https://upx.github.io/) is in the `/bin` directory and use it.
 
 #### Building
 * After setting up the prerequitises, download this repository's source code into a directory.
@@ -144,5 +150,3 @@ While you can add search pathes to your `manifest.gmodproj` to facilitate this f
 
 #### Will support (globally) installed dependencies as CLI tools?
 Yes to both, this is planned for the future.
-
-##
