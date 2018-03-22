@@ -143,7 +143,7 @@ export class Packager
         handle = open(endPoint, "wb")
         handle\write(TEMPLATE_PACKAGE_HEADER(entryPoint).."\n")
 
-        -- Make fresh set of dependencies and add the entry point
+        -- Make fresh set of dependencies and add the initial entry point
         @pendingAssets = Set()
         @addDependency(entryPoint)
 

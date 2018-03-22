@@ -15,6 +15,14 @@ export class Set
     -- Collection of items within the Set
     tableCollection: nil
 
+    -- Set::from(table tableCollection) -> Set
+    -- Static method for converting a table into a Set
+    from: (tableCollection) ->
+        -- Make a new Set and add the table's values to it
+        set = Set()
+        set\add(value) for value in *tableCollection
+        return set
+
     -- Set::constructor()
     -- Constructor for Set
     new: () =>

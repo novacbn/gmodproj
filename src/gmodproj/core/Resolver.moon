@@ -22,7 +22,7 @@ class ResolverOptions extends ConfigurationOptions
     -- ResolverOptions::configurationRules -> table
     -- Represents a LIVR ruleset for validating the configuration
     configurationRules: {
-        searchPaths:        {list_of: {is: "string"}}
+        searchPaths: {list_of: {is: "string"}}
     }
 
 -- Resolver::Resolver()

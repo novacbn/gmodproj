@@ -60,7 +60,10 @@ export class Asset
             contents    = readFileSync(@assetPath)
             contents    = @preTransform(contents, isProduction)
 
-            -- Collect the metadata of the asset before saving to cache
+            -- Reset the stale metadata data
+            @assetData.metadata = {}
+
+            -- Reset the stale metadata and recollect the asset's metadata
             @collectDependencies(contents)
 
             -- Regenerate the asset for future incremental builds
