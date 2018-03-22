@@ -1,4 +1,10 @@
-/bin
+/bin/gmodproj
+/bin/luvi
+/bin/luvit
+/bin/lit
+/bin/lit.zip
+/bin/gmodproj*
+/build/gmodproj.lua
 /dist
 /.gmodproj
 /gmodproj
