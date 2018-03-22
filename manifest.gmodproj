@@ -38,7 +38,7 @@ Project {
 
             -- Create hash files and perform cleanup
             write "./dist/gmodproj.lua", read("./build/gmodproj.lua")
-            write "./dist/gmodproj.lua.sha256", hashSHA256(read("./dist/gmodproj.lua")
+            write "./dist/gmodproj.lua.sha256", hashSHA256(read("./dist/gmodproj.lua"))
             write BINARY_DIST..".sha256", hashSHA256(read(BINARY_DIST))
             remove "./build/gmodproj.lua"
 
