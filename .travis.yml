@@ -7,9 +7,5 @@ branches:
 env:
   - GMODPROJ_BUILD_MODE=development
 
-install:
-  - wget -O ./buildLatest.sh https://raw.githubusercontent.com/novacbn/gmodproj/master/bin/buildLatest.sh
-  - chmod +x ./buildLatest.sh
-
 script:
-  - sh ./buildLatest.sh
+  - sh ./bin/buildSource.sh
