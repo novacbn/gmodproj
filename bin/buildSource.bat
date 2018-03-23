@@ -18,25 +18,32 @@ set LIT_URL="http://lit.luvit.io/packages/luvit/lit/v%LIT_VERSION%.zip"
 set GMODPROJ_URL="https://github.com/novacbn/gmodproj/releases/download/%GMODPROJ_VERSION%/gmodproj.x64.Windows.exe"
 
 :: Download prerequisites
-curl -fsS -o bin\luvi.exe "%LUVI_URL%" || goto error
-curl -fsS -o bin\lit.zip "%LIT_URL%" || goto error
-curl -fsS -o bin\gmodproj.exe "%GMODPROJ_URL%" || goto error
+echo Downloading prerequisite files...
+curl -LfsS -o bin\luvi.exe %LUVI_URL% || goto error
+curl -LfsS -o bin\lit.zip %LIT_URL% || goto error
+curl -LfsS -o bin\gmodproj.exe %GMODPROJ_URL% || goto error
 
-:: Make Luvit
+:: Make luvit.exe
+echo. & echo. & echo Making luvit.exe
 cd bin
 luvi.exe lit.zip -- make lit.zip lit.exe luvi.exe || goto error
 lit.exe make lit://luvit/luvit luvit.exe luvi.exe || goto error
 cd ..
 
-:: Build gmodproj
+:: Make gmodproj.exe
+echo. & echo. & echo Making gmodproj.exe
 bin\gmodproj.exe script buildDistributable $BUILD_MODE || goto error
 del bin\gmodproj.exe
-move /y dist\gmodproj.x64.Windows.exe bin
+move /y dist\gmodproj.x64.Windows.exe bin > nul
 rename bin\gmodproj.x64.Windows.exe gmodproj.exe
 
 :: Perform cleanup
+echo. & echo. & echo Performing cleanup...
 del bin\lit.exe
 del bin\lit.zip
+
+:: Log completion to user
+echo. & echo. & echo Build complete, use 'bin\gmodproj.exe buildDistributable [buildMode]' from now on!
 
 :error
 exit /b %errorlevel%

@@ -19,23 +19,30 @@ LIT_URL="http://lit.luvit.io/packages/luvit/lit/v$LIT_VERSION.zip"
 GMODPROJ_URL="https://github.com/novacbn/gmodproj/releases/download/$GMODPROJ_VERSION/gmodproj.x64.Linux"
 
 # Download prerequisites
-wget -O ./bin/luvi $LUVI_URL
-wget -O ./bin/lit.zip $LIT_URL
-wget -O ./bin/gmodproj $GMODPROJ_URL
+echo "Downloading prerequisite files..."
+wget -nv -O ./bin/luvi $LUVI_URL
+wget -nv -O ./bin/lit.zip $LIT_URL
+wget -nv -O ./bin/gmodproj $GMODPROJ_URL
 
-# Make Luvit
+# Make luvit
+echo "\n\nMaking luvit"
 cd ./bin
 chmod +x ./luvi
 ./luvi lit.zip -- make lit.zip lit luvi
 ./lit make lit://luvit/luvit luvit luvi
 cd ../
 
-# Build gmodproj
+# Make gmodproj
+echo "\n\nMaking gmodproj"
 chmod +x ./bin/gmodproj
 ./bin/gmodproj script buildDistributable $BUILD_MODE
 mv -f ./dist/gmodproj.x64.Linux ./bin/gmodproj
 chmod +x ./bin/gmodproj
 
 # Perform cleanup
+echo "\n\nPerforming cleanup..."
 rm ./bin/lit
 rm ./bin/lit.zip
+
+# Log completion to user
+echo "\n\nBuild complete, use './bin/gmodproj.exe buildDistributable [buildMode]' from now on!"
