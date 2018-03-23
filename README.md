@@ -1,7 +1,15 @@
 # gmodproj
-[[Latest](releases/latest) &bullet; [Releases](releases)] A simple to get started, but easy to hack, project manager for Garry's Mod
+###### **[Releases](https://github.com/novacbn/gmodproj/releases) &bullet;**
+A simple to get started, but easy to hack, project manager for Garry's Mod
 
 ---
+
+## Build Status
+| Operating System | Service | Status |
+| ------------- |:-------------:| -----:|
+| Linux-x64     | TravisCI      | [![Build Status](https://travis-ci.org/novacbn/gmodproj.svg)](https://travis-ci.org/novacbn/gmodproj) |
+| Windows-x64   | AppVeyor      | [![Build status](https://ci.appveyor.com/api/projects/status/8p7qgdoxvt7smodx?svg=true)](https://ci.appveyor.com/project/novacbn/gmodproj) |
+
 
 ## Current Status
 `gmodproj` is currently in `pre-alpha`, and is recommended only for experimental and testing purposes only! So keep this in mind:
@@ -21,7 +29,7 @@ With that said however, `gmodproj` does support these features:
     * You can also define your scripts as strings instead of function bodies, they will be ran in your Operating System's shell scripting interpreter.
 
 ## Getting Started
-First you need to grab the latest release from the [Releases Page](releases/latest) and place the binary somewhere within PATH environmental variable is set up to see.
+First you need to grab the latest release from the [Releases](https://github.com/novacbn/gmodproj/releases) and place the binary somewhere within PATH environmental variable is set up to see.
 
 #### Setting up an Addon project
 1. In a terminal goto the parent directory of where you would like to make your project reside, e.g. `/home/USERNAME/Workspace`
@@ -62,14 +70,17 @@ Commands:
 
 ## Building From Source
 #### Prerequitises
+* `curl` - Requires `curl` to download files, if building from source on Windows.
+* `wget` - Requires `wget` to download files, if building from source on Linux.
 * `luvit` - Requires [luvit](https://luvit.io/) binaries to be present in the project's `/bin` directory.
-* `gmodproj` - Requires a pre-built version of `gmodproj`, will eventually get around to adding a non-self-hosted method.
-* **_(OPTIONAL)_** `upx` - If using `gmodproj script buildDistributable [production]` to build, it will automatically detect if [upx](https://upx.github.io/) is in the `/bin` directory and use it.
+* `gmodproj` - Requires a pre-built version of `gmodproj` to be present in the project's "/bin" directory.
+* **_(OPTIONAL)_** `upx` - If using `gmodproj script buildDistributable production` to build, it will automatically detect if [upx](https://upx.github.io/) is in the `/bin` directory and use it.
 
 #### Building
-* After setting up the prerequitises, download this repository's source code into a directory.
-* Open a terminal located in the new directory and type `gmodproj script buildDistributable`.
-* When finished, a newly minted `gmodproj` _(or `gmodproj.exe` if on Windows)_ will be located in the `/bin` directory of the source code.
+* Navigate to your copy of `gmodproj`'s source code directory in a terminal.
+* In your terminal, type `./bin/buildSource.sh` _(or `bin\buildSource.bat` if on Windows)_
+    * It will automatically download and build the prerequitises files, then compile `gmodproj`
+* Once complete, a new `gmodproj` _(or `gmodproj.exe` if on Windows)_ will be located in your `/bin` directory.
 
 ## Frequently Asked Questions (FAQ)
 #### Can you provide an installer for `gmodproj` instead of me mucking with things myself?
@@ -142,11 +153,11 @@ myFunc1()
 #### How do I distribute my source code?
 Same as any other source code, just make sure to upload `manifest.gmodproj` so people can build your project, and include your `packages` folder aswell.
 
-#### Can I use this for non-Garry's Mod projects?
-By default, `gmodproj` has no Garry's Mod specific features other than the built-in project templates used for the `gmodproj new` command. Otherwise you should be good to go.
-
 #### Will gmodproj support globally installed dependencies?
 While you can add search pathes to your `manifest.gmodproj` to facilitate this functionality, `gmodproj` will **never** support global dependencies out of the box.
 
 #### Will support (globally) installed dependencies as CLI tools?
 Yes to both, this is planned for the future.
+
+#### Can I use this for non-Garry's Mod projects?
+By default, `gmodproj` has no Garry's Mod specific features other than the built-in project templates used for the `gmodproj new` command. Otherwise you should be good to go.
