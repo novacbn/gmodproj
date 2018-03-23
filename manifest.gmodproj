@@ -24,7 +24,7 @@ Project {
                     "bin\\luvi.exe", "bin\\luvit.exe", "bin\\upx.exe", "bin\\gmodproj.exe", "dist\\gmodproj.#{SYSTEM_OS_ARCH}.#{SYSTEM_OS_TYPE}.exe"
 
             -- Produce a project build of gmodproj
-            success, status, stdout = execFormat BINARY_GMODPROJ, "build", isProduction and "production"
+            success, status, stdout = execFormat BINARY_GMODPROJ, "build", isProduction and "production" or "development"
             return 1, "Project build failed: (#{status})\n#{stdout}" unless success
 
             -- Create a distributable executable with the local Luvit binaries
