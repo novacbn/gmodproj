@@ -1,0 +1,13 @@
+version: {build}
+
+platform: x64
+
+branches:
+  only:
+    - master
+
+environment:
+  GMODPROJ_BUILD_MODE: development
+
+build_script:
+  - bin\buildSource.bat
