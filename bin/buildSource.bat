@@ -18,9 +18,9 @@ set LIT_URL="http://lit.luvit.io/packages/luvit/lit/v%LIT_VERSION%.zip"
 set GMODPROJ_URL="https://github.com/novacbn/gmodproj/releases/download/%GMODPROJ_VERSION%/gmodproj.x64.Windows.exe"
 
 :: Download prerequisites
-wget -O bin\luvi.exe "%LUVI_URL%" || goto error
-wget -O bin\lit.zip "%LIT_URL%" || goto error
-wget -O bin\gmodproj.exe "%GMODPROJ_URL%" || goto error
+curl -fsS -o bin\luvi.exe "%LUVI_URL%" || goto error
+curl -fsS -o bin\lit.zip "%LIT_URL%" || goto error
+curl -fsS -o bin\gmodproj.exe "%GMODPROJ_URL%" || goto error
 
 :: Make Luvit
 cd bin
