@@ -78,7 +78,7 @@ Project {
 
             -- If a production build, hash the build output
             if isProduction
-                write "./dist/gmodproj.lua.sha256", read("./dist/gmodproj.lua")
+                write "./dist/gmodproj.lua.sha256", hashSHA256(read("./dist/gmodproj.lua"))
                 write BINARY_DIST..".sha256", hashSHA256(read(BINARY_DIST))
 
             -- Log success!
