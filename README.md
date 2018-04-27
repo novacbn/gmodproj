@@ -2,8 +2,6 @@
 ###### **[Releases](https://github.com/novacbn/gmodproj/releases) &bullet;**
 A simple to get started, but easy to hack, project manager for Garry's Mod
 
----
-
 ## Build Status
 | Operating System | Service | Status |
 | ------------- |:-------------:| -----:|
@@ -27,6 +25,9 @@ With that said however, `gmodproj` does support these features:
     * You can also specifiy more search paths for packages in your project's manifest!
 * Run `MoonScript` code as defined in your project's `manifest.gmodproj` for task automation.
     * You can also define your scripts as strings instead of function bodies, they will be ran in your Operating System's shell scripting interpreter.
+* Easily extendable with plugins, see [gmodproj-plugin-builtin](httsp://github.com/novacbn/gmodproj-plugin-builtin) as a sample plugin. Which also powers the built-in functionality of `gmodproj`
+    * Just put built plugins in your project's `.gmodproj/plugins` directory or for all your projects, `%APPDATA%\.gmodproj\plugins` _(Windows)_ or `~/.gmodproj/plugins` _(Linux)_
+    * Then enable them in your `manifest.gmodproj`, see `gmodproj`'s own [manifest.gmodproj](https://github.com/novacbn/gmodproj/blob/master/manifest.gmodproj) as an example.
 
 ## Getting Started
 First you need to grab the latest release from the [Releases](https://github.com/novacbn/gmodproj/releases) and place the binary somewhere within PATH environmental variable is set up to see.
@@ -89,7 +90,7 @@ It's eventually planned to provide some installer scripts to help with this, alt
 #### How do I exports values for my other scripts in my build to use?
 Any value that isn't localized will be exported, e.g.:
 ```lua
--- script1.lua
+-- src/script1.lua
 function myFunc1()
     print("hello")
 end
@@ -100,8 +101,8 @@ end
 ```
 
 ```lua
--- script2.lua
-local script1 = import("script1")
+-- src/script2.lua
+local script1 = import("my-name/my-project/script1")
 
 script1.myFunc1() -- Will print 'hello'
 script2.myFunc2() -- Will error at runtime
@@ -140,24 +141,24 @@ myFunc1()
 
 Which is special-case transpiled into:
 ```lua
-local myFunc1 = dependency("script1").myFunc1
+local myFunc1 = dependency("my-name/my-project/script1").myFunc1
 myFunc1()
 ```
 
 Due to `import` being a keyword in MoonScript, you can use the alias `dependency` just like in Lua code:
 ```moonscript
-script1 = dependency "script1"
+script1 = dependency "my-name/my-project/script1"
 myFunc1()
 ```
 
 #### How do I distribute my source code?
 Same as any other source code, just make sure to upload `manifest.gmodproj` so people can build your project, and include your `packages` folder aswell.
 
+#### Can I use this for non-Garry's Mod projects?
+By default, `gmodproj` has no Garry's Mod specific features other than the built-in project templates used for the `gmodproj new` command. Otherwise you should be good to go.
+
 #### Will gmodproj support globally installed dependencies?
 While you can add search pathes to your `manifest.gmodproj` to facilitate this functionality, `gmodproj` will **never** support global dependencies out of the box.
 
 #### Will support (globally) installed dependencies as CLI tools?
 Yes to both, this is planned for the future.
-
-#### Can I use this for non-Garry's Mod projects?
-By default, `gmodproj` has no Garry's Mod specific features other than the built-in project templates used for the `gmodproj new` command. Otherwise you should be good to go.
