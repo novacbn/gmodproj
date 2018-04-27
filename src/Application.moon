@@ -194,7 +194,7 @@ export Application = Object\extend {
         logFatal("Invalid template '#{templateName}'!") unless template
 
         unless projectAuthor and #projectAuthor > 0 and match(projectAuthor, PATTERN_METADATA_NAME)
-            logFatal("Project name #{projectAuthor} is invalid, must be lowercase alphanumeric and dashes only!")
+            logFatal("Project author #{projectAuthor} is invalid, must be lowercase alphanumeric and dashes only!")
 
         unless projectName and #projectName > 0 and match(projectName, PATTERN_METADATA_NAME)
             logFatal("Project name #{projectName} is invalid, must be lowercase alphanumeric and dashes only!")

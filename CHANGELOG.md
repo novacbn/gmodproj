@@ -31,4 +31,4 @@
 * Factored out most utility functionality into [novautils](https://github.com/novacbn/novautils)
     * Using `novacbn/novautils/Object` for OOP instead of MoonScript's `class` keyword. Allowing Lua, and other languages, to use `gmodproj`'s OOP functionality more readily
     * All of `novautils 0.2.0` is included as a supplemental std library. Access in plugins via `gmodproj.require('novacbn/novautils/...')`
-* Fixed regression of `gmodproj build` not supporting
+* Fixed regression of `gmodproj build` not supporting dashes in import names
