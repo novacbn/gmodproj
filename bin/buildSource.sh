@@ -8,10 +8,16 @@ else
     BUILD_MODE="production"
 fi
 
+if [ $BUILD_MODE="production" ]; then
+    BUILD_BINARY="gmodproj.x64.Linux"
+else
+    BUILD_BINARY="gmodproj-dev.x64.Linux"
+fi
+
 # Dependent versions prerequisites
 LUVI_VERSION="2.7.6"
 LIT_VERSION="3.5.4"
-GMODPROJ_VERSION="0.2.0"
+GMODPROJ_VERSION="0.4.0"
 
 # Download urls for prerequisites
 LUVI_URL="https://github.com/luvit/luvi/releases/download/v$LUVI_VERSION/luvi-regular-Linux_x86_64"
@@ -35,8 +41,8 @@ cd ../
 # Make gmodproj
 echo "\n\nMaking gmodproj"
 chmod +x ./bin/gmodproj
-./bin/gmodproj script buildDistributable $BUILD_MODE
-mv -f ./dist/gmodproj.x64.Linux ./bin/gmodproj
+./bin/gmodproj bin build $BUILD_MODE
+mv -f ./dist/$BUILD_BINARY ./bin/gmodproj
 chmod +x ./bin/gmodproj
 
 # Perform cleanup
@@ -45,4 +51,4 @@ rm ./bin/lit
 rm ./bin/lit.zip
 
 # Log completion to user
-echo "\n\nBuild complete, use './bin/gmodproj.exe buildDistributable [buildMode]' from now on!"
+echo "\n\nBuild complete, use './bin/gmodproj bin build [buildMode]' from now on!"

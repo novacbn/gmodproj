@@ -1,7 +1,7 @@
 import hashSHA256 from dependency "novacbn/gmodproj/lib/utilities/openssl"
 
 -- Configure the environment for building
-{buildMode}     = ({...})
+buildMode       = ({...})[1] or "production"
 isProduction    = buildMode\lower() == "production"
 buildMode       = isProduction and "production" or "development"
 mkdir "./dist" unless isDir "./dist"
