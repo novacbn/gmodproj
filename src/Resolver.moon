@@ -10,8 +10,8 @@ import Default, Object from "novacbn/novautils/utilities/Object"
 
 import ResolverOptions from "novacbn/gmodproj/schemas/ResolverOptions"
 import PROJECT_PATH from "novacbn/gmodproj/lib/constants"
-import isFile from "novacbn/gmodproj/lib/fsx"
-import makeStringEscape from "novacbn/gmodproj/lib/utilities/stringx"
+import isFile from "novacbn/gmodproj/lib/utilities/fs"
+import makeStringEscape from "novacbn/gmodproj/lib/utilities/string"
 
 -- :: escapePattern(string value) -> string
 -- Escapes a string to be Lua-pattern safe

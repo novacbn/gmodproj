@@ -10,9 +10,9 @@ A simple to get started, but easy to hack, project manager for Garry's Mod
 
 
 ## Current Status
-`gmodproj` is currently in `pre-alpha`, and is recommended only for experimental and testing purposes only! So keep this in mind:
+`gmodproj` is currently in `pre-alpha`, and is recommended only for experimentation and testing purposes only! So keep this in mind:
 * Documentation is sorely lacking, that's **next priority**!
-* `manifest.gmodproj` and `lock.gmodproj` files are both not standardized as-of yet. In the future these may break.
+* `.gmodmanifest` and `.gmodpackages` files are both not standardized as-of yet. In the future these may break.
 * `gmodproj` does not support a watch mode yet, so `gmodproj build` must be ran manually.
 * Remote package installation is not supported as-of yet, packages must be manually installed to your project's `packages` folder _(or other specified search paths)_.
 * The API for extending `gmodproj` with installable packages is also not standardized, so any current extensions may also break.
@@ -124,12 +124,16 @@ _G.mynamespace.myFunc = myFunc
 #### What types of assets can I import?
 By default, `gmodproj` supports the following scripting languages:
 * `.lua`
-* `.moon` - MoonScript files, transpiled to Lua as build time.
+* `.moon` - MoonScript scripting language, transpile to valid Lua code on build.
 
 By default, `gmodproj` also supports the following data markups:
-* `.datl` - Lua Data File, the data format used by `gmodproj` based on `MoonScript` formatting, compiled to a Lua table at build time.
-* `.json` - JavaScript Object Notation, a common data transfer format, compiled to a Lua table at build time.
-* `.toml` - Tom's Obvious Minimal Language, a simple configuration format, compiled to a Lua table at build time.
+* `.datl`           - Lua Data File, the data format used by `gmodproj` based on `MoonScript` formatting, compiled to a Lua table at build time. **(DEPRECATED)**
+* `.json`           - JavaScript Object Notation, a common data transfer format, compiled to a Lua table at build time.
+* `.toml`           - Tom's Obvious Minimal Language, a simple configuration format, compiled to a Lua table at build time.
+* `.lprop`          - Lua-based human-readable properties format, using standard Lua table syntax.
+* `.mprop`          - MoonScript-based human-readable properties format, using standard MoonScript table syntax.
+* `.gmodmanifest`   - Same as `.mprop`, allows importation of project files.
+* `.gmodpackages`   - Same as `.mprop`, allows importation of project files.
 
 #### Do MoonScript files handle imports differently than Lua files?
 Ever so slightly, yes. As seen in the `gmodproj` codebase, MoonScript allows for slightly streamlined importing:
@@ -152,13 +156,24 @@ myFunc1()
 ```
 
 #### How do I distribute my source code?
-Same as any other source code, just make sure to upload `manifest.gmodproj` so people can build your project, and include your `packages` folder aswell.
+Same as any other source code, just make sure to upload `.gmodmanifest` so people can build your project, and include your `packages` folder aswell.
 
 #### Can I use this for non-Garry's Mod projects?
-By default, `gmodproj` has no Garry's Mod specific features other than the built-in project templates used for the `gmodproj new` command. Otherwise you should be good to go.
+By default, `gmodproj` targets Garry's Mod during the build process. To target standard Lua, add `targetPlatform: 'lua'` to your `.gmodmanifest`.
 
 #### Will gmodproj support globally installed dependencies?
-While you can add search pathes to your `manifest.gmodproj` to facilitate this functionality, `gmodproj` will **never** support global dependencies out of the box.
+While you can add search pathes to your `.gmodmanifest` to facilitate this functionality, `gmodproj` will **never** support global dependencies out of the box.
 
 #### Will support (globally) installed dependencies as CLI tools?
 Yes to both, this is planned for the future.
+
+## Dependencies/Third-Party
+
+* [davidm/lua-glob-pattern](https://github.com/davidm/lua-glob-pattern)
+* [fperrad/lua-LIVR](https://github.com/fperrad/lua-LIVR)
+* [leafo/moonscript](https://github.com/leafo/moonscript)
+* [novacbn/novautils](https://github.com/novacbn/novautils)
+* [novacbn/properties](https://github.com/novacbn/properties)
+* [pkulchenko/serpent](https://github.com/pkulchenko/serpent)
+* [rxi/json](https://github.com/rxi/json)
+* [starwing/gettime.lua](https://gist.github.com/starwing/1757443a1bd295653c39)

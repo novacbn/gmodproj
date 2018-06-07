@@ -1,3 +1,5 @@
+-- source: https://gist.github.com/starwing/1757443a1bd295653c39
+
 local tonumber  = _G.tonumber
 local ffi       = require("ffi")
 local math      = require("math")

@@ -3,7 +3,7 @@ import arch, os from jit
 
 import join from require "path"
 
-import isAffirmative from "novacbn/gmodproj/lib/utilities/stringx"
+import isAffirmative from "novacbn/gmodproj/lib/utilities/string"
 
 -- ::userHome -> string
 -- Represents the home folder for application data of the user
@@ -15,7 +15,7 @@ userHome = switch os
 -- ::APPLICATION_CORE_VERSION -> table
 -- Represents the current version of the application
 -- export
-export APPLICATION_CORE_VERSION = {0, 3, 0}
+export APPLICATION_CORE_VERSION = {0, 4, 0}
 
 -- ::ENV_ALLOW_UNSAFE_SCRIPTING -> boolean
 -- Represents a environment variable flag if gmodproj should allow unsafe scripting
@@ -53,6 +53,21 @@ export PROJECT_PATH = with {}
     --
     .data = join(.home, ".gmodproj")
 
+    -- PROJECT_PATH::bin -> string
+    -- Represents the directory of utility scripts shipped with the project directory
+    --
+    .bin = join(.home, "bin")
+
+    -- PROJECT_PATH::manifest -> string
+    -- Represents the project's metadata manifest
+    --
+    .manifest = join(.home, ".gmodmanifest")
+
+    -- PROJECT_PATH::packages -> string
+    -- Represents the project's package manifest 
+    --
+    .packages = join(.home, ".gmodpackages")
+
     -- PROJECT_PATH::cache -> string
     -- Represents the directory of previously compiled modules in from the current project
     --
@@ -62,16 +77,6 @@ export PROJECT_PATH = with {}
     -- Represents the directory of log files from actions previously taken for the current project
     --
     .logs = join(.data, "logs")
-
-    -- PROJECT_PATH::manifest -> string
-    -- Represents the project's metadata manifest
-    --
-    .manifest = join(.home, "manifest.gmodproj")
-
-    -- PROJECT_PATH::packages -> string
-    -- Represents the project's package manifest 
-    --
-    .packages = join(.home, "packages.gmodproj")
 
     -- PROJECT_PATH::plugins -> string
     -- Represents the directory of project installed plugin packages

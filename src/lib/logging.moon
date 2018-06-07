@@ -68,7 +68,7 @@ makeLogger = (tag, color, defaultOptions={}) ->
 -- export
 export enableFileLogging = () ->
     -- Only enable physical logging if previously not enabled
-    if BUFFER_MEMORY_LOG
+    if BUFFER_MEMORY_LOG and TOGGLE_FILE_LOGGING
         -- Open logging file and empty buffer into it
         HANDLE_FILE_LOG = open(PATH_FILE_LOG, "wb")
         HANDLE_FILE_LOG\write(BUFFER_MEMORY_LOG\toString())

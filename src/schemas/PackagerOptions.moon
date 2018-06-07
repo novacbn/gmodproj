@@ -7,7 +7,7 @@ export PackagerOptions = Schema\extend {
     -- PackagerOptions::namespace -> string
     -- Represents the nested namespace of the schema
     --
-    namespace: "Project.Packager"
+    namespace: "Packager"
 
     -- PackagerOptions::schema -> table
     -- Represents the LIVR validation schema

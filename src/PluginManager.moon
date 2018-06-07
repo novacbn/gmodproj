@@ -7,7 +7,7 @@ import Default, Object from "novacbn/novautils/utilities/Object"
 
 import APPLICATION_CORE_VERSION, PROJECT_PATH, USER_PATH from "novacbn/gmodproj/lib/constants"
 import logFatal from "novacbn/gmodproj/lib/logging"
-import isFile from "novacbn/gmodproj/lib/fsx"
+import isFile from "novacbn/gmodproj/lib/utilities/fs"
 
 -- ::loadPlugin(string pluginName) -> table or nil, string or nil
 -- Loads the plugin and returns its exports table

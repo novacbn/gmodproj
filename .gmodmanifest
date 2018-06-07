@@ -1,0 +1,22 @@
+name:       "gmodproj"
+author:     "novacbn"
+version:    "0.4.0"
+repository: "github://novacbn/gmodproj"
+
+buildDirectory: "build"
+
+projectBuilds:
+    "novacbn/gmodproj/main": "gmodproj"
+
+Packager:
+    targetPlatform: "lua"
+
+    includedAssets: {
+        -- Include installed version of novautils as a supplemental std for applications and plugins
+        "novacbn/novautils/*"
+    }
+
+Plugins:
+    -- gmodproj-plugin-builtin is enabled by default, we want full minification on production though
+    "gmodproj-plugin-builtin":
+        minificationLevel: "full"

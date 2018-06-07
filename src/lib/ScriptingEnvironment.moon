@@ -14,8 +14,8 @@ import merge from "novacbn/novautils/table"
 
 import SYSTEM_OS_ARCH, SYSTEM_OS_TYPE from "novacbn/gmodproj/lib/constants"
 import fromString, toString from "novacbn/gmodproj/lib/datafile"
-import exec, execFormat, isDir, isFile from "novacbn/gmodproj/lib/fsx"
-assertx = dependency "novacbn/gmodproj/lib/utilities/assertx"
+import exec, execFormat, isDir, isFile from "novacbn/gmodproj/lib/utilities/fs"
+assertx = dependency "novacbn/gmodproj/lib/utilities/assert"
 
 -- ChunkEnvironment::ChunkEnvironment(string environmentRoot, boolean allowUnsafe)
 -- Represents a primitive pseudo-sandboxed scripting environment

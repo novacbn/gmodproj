@@ -1,7 +1,7 @@
 import basename from require "path"
 
 import Asset from "novacbn/gmodproj/api/Asset"
-import toByteString from "novacbn/gmodproj/lib/utilities/stringx"
+import toByteString from "novacbn/gmodproj/lib/utilities/string"
 
 -- ::TEMPLATE_MODULE_LUA(string assetName, string byteString) -> string
 -- Templates a resource asset into Lua module the parsed a byte string

@@ -35,14 +35,14 @@ export makeTemplate = (stringTemplate) ->
             return tostring(tokenValue)
         )
 
--- ::makeStringEscape(table escapePairs) -> function
--- Makes a string escaping function via a token, replacement array
-export makeStringEscape = (escapePairs) ->
+-- ::makeStringEscape(table lookup) -> function
+-- Makes a string naive replacement function via a token, replacement array
+export makeStringEscape = (lookup) ->
     -- Make a helper escape function
     return (value) ->
         -- Escape every pair of strings and return modified string
-        unescapedString = gsub(value, escapePair[1], escapePair[2]) for escapePair in *escapePairs
-        return unescapedString
+        value = gsub(value, tokens[1], tokens[2]) for tokens in *lookup
+        return value
 
 -- ::toBytes(string sourceString) -> table
 -- Converts a string into a table of bytes

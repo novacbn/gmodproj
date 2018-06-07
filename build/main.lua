@@ -1,10 +1,10 @@
--- hack:
+-- HACKY:
 --  for some reason in Luvit, the local require is Luvit's environment
---  while the global require is Luajit's environment
+--  while the global require is LuaJIT's environment
 _G.require = require
 
 require("./init")(function (...)
-    -- hack:
+    -- NOTE:
     --  this is needed to bootstrap the environment of the project build
     --  otherwise would use the project build as the entrypoint instead
 
@@ -17,6 +17,6 @@ require("./init")(function (...)
     end
 
     xpcall(function ()
-        require("./gmodproj").Application:new(unpack(process.argv))
+        require("./gmodproj")
     end, onError)
 end)

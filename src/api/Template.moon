@@ -1,12 +1,11 @@
-
 import dirname, join from require "path"
 import existsSync, mkdirSync, writeFileSync from require "fs"
-import encode from require "json"
 
 import Object from "novacbn/novautils/utilities/Object"
+json        = dependency "rxi/json/main"
+properties  = dependency "novacbn/properties/exports"
 
-import isDir from "novacbn/gmodproj/lib/fsx"
-import toString from "novacbn/gmodproj/lib/datafile"
+import isDir from "novacbn/gmodproj/lib/utilities/fs"
 
 -- Template::Template()
 -- Represents a template for quickly creating new project directory structures
@@ -50,14 +49,17 @@ export Template = Object\extend {
         error("bad argument #1 to 'write' (parent directory does not exist)") unless isDir(dirname(filePath))
         writeFileSync(filePath, fileContents)
 
-    -- Template::writeDataFile(string filePath, table sourceTable) -> void
-    -- Encodes and writes the source table to the specified file within the new project directory using DataFile encoding
+    -- Template::writeProperties(string filePath, table sourceTable) -> void
+    -- Encodes a Lua table into MoonScript properties format and writes it to the specified file
     --
     writeDataFile: (filePath, sourceTable) =>
-        @write(filePath, toString(sourceTable))
+        @write(filePath, properties.encode(sourceTable, {propertiesEncoder: "moonscript"}))
 
+    -- Template::writeJSON(string filePath, table sourceTable) -> void
+    -- Encodes a Lua table into JSON and writes it to the specified file
+    --
     writeJSON: (filePath, sourceTable) =>
-        @write(filePath, encode(sourceTable))
+        @write(filePath, json.encode(sourceTable))
 
     -- Template::createProject(string ...) -> void
     -- Event called to construct the new project, providing any extra arguments specified by the user

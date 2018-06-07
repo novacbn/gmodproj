@@ -1,6 +1,6 @@
-import gsub from string
+import pairs from _G
+import gsub, upper from string
 import concat, insert from table
-import upper from string
 
 livr = require "LIVR/Validator"
 
@@ -14,6 +14,7 @@ LIVR_ERROR_LOOKUP = {
     NOT_ARRAY:      "expected array of values"
     NOT_STRING:     "expected string value"
     NOT_BOOLEAN:    "expected boolean value"
+    MINIMUM_ITEMS:  "expected a number of minimum array items"
     WRONG_FORMAT:   "option did not match pattern"
 }
 
@@ -21,6 +22,21 @@ LIVR_ERROR_LOOKUP = {
 -- Represents extra utility rules to use in LIVR validation rules
 --
 LIVR_UTILITY_RULES = {
+    is_key_pairs: (keyCheck, valueCheck) =>
+        keyValidator    = @is(keyCheck)
+        valueValidator  = @is(valueCheck)
+
+        return (tbl) ->
+            local err
+            for key, value in pairs(tbl)
+                _, err = keyValidator(key)
+                return nil, err if err
+
+                _, err = valueValidator(value)
+                return nil, err if err
+
+            return tbl
+
     is: (check) =>
         if type(check) == "table"
             -- Format the error string for log matching
@@ -46,6 +62,7 @@ LIVR_UTILITY_RULES = {
 
                 -- Failed to validate, return the error string
                 return nil, err
+
 
     min_items: (amount) =>
         return (value) ->

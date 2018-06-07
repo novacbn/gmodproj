@@ -1,6 +1,65 @@
 # gmodproj changelog
 
-## 0.0.3
+## 0.4.0
+* Added the `is_key_pair` for keypair validation using `novacbn/gmodproj/api/Schema`
+    * **definition**
+    ```lua
+    {
+        is_key_pair: {keyType/tableOfTypes, valueType/tableOfTypes}
+    }
+    ```
+
+    * **sample**
+    ```lua
+    myKey = {
+        is_key_pair = {"string", {"boolean", "number"}}
+    }
+    ```
+
+    * **valid sample data**
+    ```lua
+    myKey = {
+        validStringNumber   = 3,
+        validStringBoolean  = false,
+    }
+    ```
+* Added missing error string for `MINIMUM_ITEMS` Schema validation code
+* Added fatal log on missing build directory
+* Added `writeProperites` to `novacbn/gmodproj/api/Template::Template`
+    * Removed `writeDataFile` as a result, update `Template` classes to adhere to the new `.gmodmanifest` format
+* Fixed all version information containing `0.0.3` -> `0.3.0`
+* Deprecated `novacbn/gmodproj/lib/datafile` in favor of [novacbn/properties](https://github.com/novacbn/properties)
+    * Removal in `0.5.0`
+* Updated project `.gmodmanifest` to no longer take scripts and renamed `gmodproj script <scriptName>` to `gmodproj bin <scriptName>`
+    * Now executes scripts found within `${PROJECTHOME}/bin` without their file extension.
+    * Supported script types:
+        * `.lua`
+        * `.moon`
+        * `.sh` - Linux only
+        * `.bat` - Windows only
+* Updated `manifest.gmodproj` and `packages.gmodproj` to `.gmodmanifest` and `.gmodpackages`
+    * Both are now using [novacbn/properties](https://github.com/novacbn/properties) for parsing
+        * See `gmodproj`'s [.gmodmanifest](https://github.com/novacbn/gmodproj/blob/master/.gmodmanifest) as an example
+    * The following properties were renamed for simplification:
+        `projectName` -> `name`
+        `projectAuthor` -> `author`
+        `projectRepository` -> `repository`
+        `projectVersion` -> `version`
+        `entryPoints` -> `projectBuilds`
+* Updated various Schemas have been updated
+    * `ProjectOptions.projectBuilds` - Only accepts `string` keys and `string` or `table` values keypairs
+    * `ProjectOptions.Plugins` - Only accepts `string` keys and `table` values keypairs
+* Updated various module paths for organization/consistency
+    * `novacbn/gmodproj/lib/digests` -> `novacbn/gmodproj/lib/utilities/openssl`
+    * `novacbn/gmodproj/lib/fsx` -> `novacbn/gmodproj/lib/utilities/fs`
+    * `novacbn/gmodproj/lib/utilities/assertx` -> `novacbn/gmodproj/lib/utilities/assert`
+    * `novacbn/gmodproj/lib/utilities/stringx` -> `novacbn/gmodproj/lib/utilities/string`
+* Upgraded `novacbn/gmodproj-builtin-plugin` to `0.2.0`
+    * Supports `.lprop` and `.mprop` file formats via [novacbn/properties](https://github.com/novacbn/properties)
+* Refactored `Application.moon` to `main.moon` and `commands/<command>.moon` for easier reasoning about of current and future commands
+
+## 0.3.0
+* Added third-party/dependencies references to `README.md`
 * Added `Project.projectRepository` and `Project.projectVersion` metadata fields in `manifest.gmodproj`
     * Will be used in the future for package installations
 * Added support for targetting different scripting platforms, targets set in `Packager.targetPlaform`: `lua, garrysmod`

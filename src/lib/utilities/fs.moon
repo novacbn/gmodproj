@@ -1,5 +1,5 @@
 import ipairs from _G
-import open, popen from io
+import popen from io
 import match from string
 import concat, insert from table
 

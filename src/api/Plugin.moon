@@ -13,7 +13,7 @@ export Plugin = Object\extend {
     constructor: (options) =>
         -- If a Schema was provided for the Plugin, validate and store the provided options
         if @schema
-            @schema.namespace   = "Project.Plugins['"..@schema.namespace.."']"
+            @schema.namespace   = "Plugins['"..@schema.namespace.."']"
             @options            = @schema\new(options)
 
     -- Plugin::registerAssets(Resolver resolver) -> void

@@ -11,7 +11,7 @@ export ResolverOptions = Schema\extend {
     -- ResolverOptions::namespace -> string
     -- Represents the nested namespace of the schema
     --
-    namespace: "Project.Resolver"
+    namespace: "Resolver"
 
     -- ResolverOptions::schema -> table
     -- Represents the LIVR validation schema

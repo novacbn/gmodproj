@@ -7,9 +7,9 @@ import decode, encode from "rxi/json/main"
 import Object from "novacbn/novautils/utilities/Object"
 
 import PROJECT_PATH from "novacbn/gmodproj/lib/constants"
-import hashSHA1 from "novacbn/gmodproj/lib/digests"
-import isFile from "novacbn/gmodproj/lib/fsx"
+import hashSHA1 from "novacbn/gmodproj/lib/utilities/openssl"
 import logInfo, logWarn from "novacbn/gmodproj/lib/logging"
+import isFile from "novacbn/gmodproj/lib/utilities/fs"
 import AssetData from "novacbn/gmodproj/schemas/AssetData"
 
 -- Asset::Asset()

@@ -9,7 +9,8 @@ import loadstring from require "moonscript/base"
 
 import isNumericTable, isSequentialTable from "novacbn/novautils/table"
 
-import makeStringEscape from "novacbn/gmodproj/lib/utilities/stringx"
+import deprecate from "novacbn/gmodproj/lib/utilities/deprecate"
+import makeStringEscape from "novacbn/gmodproj/lib/utilities/string"
 
 -- ::escapeString(string unescapedString) -> string
 -- Escapes a string to be Lua-safe
@@ -150,6 +151,8 @@ ChunkEnvironment = (dataExports={}) ->
 -- Parses a function chunk as a DataFile
 -- export
 export loadChunk = (sourceChunk) ->
+    deprecate("novacbn/gmodproj/lib/datafile::loadChunk", "novacbn/gmodproj/lib/datafile::loadChunk is deprecated, see 0.4.0 changelog")
+
     -- Make the new environment for the chunk then run and return exports
     chunkEnvironment, dataExports = ChunkEnvironment()
     setfenv(sourceChunk, chunkEnvironment)()
@@ -161,6 +164,8 @@ export loadChunk = (sourceChunk) ->
 --  add flag to perform lexical parsing instead of loading code for safer deserialization
 -- export
 export fromString = (sourceString, chunkName="DataFile Chunk") ->
+    deprecate("novacbn/gmodproj/lib/datafile::fromString", "novacbn/gmodproj/lib/datafile::fromString is deprecated, see 0.4.0 changelog")
+
     -- Parse the string with MoonScript then load it as a function chunk
     sourceChunk = loadstring(sourceString, chunkName)
     return loadChunk(sourceChunk)
@@ -171,6 +176,8 @@ export fromString = (sourceString, chunkName="DataFile Chunk") ->
 --  support alphabetic and values before tables sortings
 -- export
 export toString = (sourceTable) ->
+    deprecate("novacbn/gmodproj/lib/datafile::toString", "novacbn/gmodproj/lib/datafile::toString is deprecated, see 0.4.0 changelog")
+
     -- Validate the table then serialize it
     error("only table values can be serialized") unless type(sourceTable) == "table"
     return typeEncodeMap.value.table(sourceTable, 0)

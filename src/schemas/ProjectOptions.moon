@@ -26,41 +26,33 @@ export ProjectOptions = Schema\extend {
     -- Represents the LIVR validation schema
     --
     schema: {
-        Project: {
-            nested_object: {
-                projectName:        {is: "string", like: PATTERN_METADATA_NAME}
-                projectAuthor:      {is: "string", like: PATTERN_METADATA_NAME}
-                projectVersion:     {is: "string", like: PATTERN_METADATA_VERSION}
-                projectRepository:  {is: "string", like: PATTERN_METADATA_REPOSITORY}
+        name:        {is: "string", like: PATTERN_METADATA_NAME}
+        author:      {is: "string", like: PATTERN_METADATA_NAME}
+        version:     {is: "string", like: PATTERN_METADATA_VERSION}
+        repository:  {is: "string", like: PATTERN_METADATA_REPOSITORY}
 
-                buildDirectory:     {is: "string"}
-                sourceDirectory:    {is: "string"}
+        buildDirectory:     {is: "string"}
+        sourceDirectory:    {is: "string"}
 
-                entryPoints: {
-                    min_items: 1
-
-                    list_of: {
-                        list_of: {is: "string"}
-                    }
-                }
-
-                Packager:   {"any_object"}
-                Plugins:    {"any_object"} -- TODO: string->table keypair checks
-                Resolver:   {"any_object"}
-                Scripts:    {"any_object"} -- TODO: string->string/function keypair checks
-            }
+        projectBuilds: {
+            is_key_pairs: {"string", {"string", "table"}}
         }
+
+        Plugins: {
+            is_key_pairs: {"string", "table"}
+        }
+
+        Packager:   {"any_object"}
+        Resolver:   {"any_object"}
     }
 
     -- ProjectOptions::default -> table
     -- Represents the default values that are merged before validation
     --
     default: {
-        Project: {
-            buildDirectory:     "dist"
-            sourceDirectory:    "src"
+        buildDirectory:     "dist"
+        sourceDirectory:    "src"
 
-            Plugins: MAP_DEFAULT_PLUGINS
-        }
+        Plugins: MAP_DEFAULT_PLUGINS
     }
 }
