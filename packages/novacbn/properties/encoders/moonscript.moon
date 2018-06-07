@@ -26,7 +26,7 @@ export MoonScriptEncoder = with {}
     -- MoonScriptEncoder::string_key(string value) -> string
     -- Encodes a string-based key to the current string buffer
     --
-    .string_key = (value) => match(value, "^%a") and value or format("%q", value)
+    .string_key = (value) => match(value, "^%a+$") and value or format("%q", value)
 
     -- MoonScriptEncoder::map(table map) -> void
     -- Encodes a hashmap-based table to the current string buffer
