@@ -52,7 +52,7 @@ export Template = Object\extend {
     -- Template::writeProperties(string filePath, table sourceTable) -> void
     -- Encodes a Lua table into MoonScript properties format and writes it to the specified file
     --
-    writeDataFile: (filePath, sourceTable) =>
+    writeProperties: (filePath, sourceTable) =>
         @write(filePath, properties.encode(sourceTable, {propertiesEncoder: "moonscript"}))
 
     -- Template::writeJSON(string filePath, table sourceTable) -> void

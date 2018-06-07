@@ -2,6 +2,7 @@ import pairs, type from _G
 import match from string
 import concat, sort from table
 
+import existsSync, mkdirSync from require "fs"
 import join from require "path"
 import hasInherited from "novacbn/novautils/utilities/Object"
 

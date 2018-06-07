@@ -42,8 +42,8 @@ TEMPLATE_TEXT_HELP = (version, commands, flags) -> "Garry's Mod Project Manager 
 Syntax:		gmodproj [flags] [command]
 
 Examples:	gmodproj bin prebuild
-			gmodproj build production
-			gmodproj new addon novacbn my-addon
+		gmodproj build production
+		gmodproj new addon novacbn my-addon
 
 Flags:
 #{flags}

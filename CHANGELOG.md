@@ -1,5 +1,9 @@
 # gmodproj changelog
 
+## 0.4.1
+* Fixed project creation via `gmodproj new`
+* Updated CI scripts for `0.4.0`
+
 ## 0.4.0
 * Added the `is_key_pair` for keypair validation using `novacbn/gmodproj/api/Schema`
     * **definition**

@@ -51,22 +51,25 @@ First you need to grab the latest release from the [Releases](https://github.com
 ## CLI Options
 ```shell
 novacbn@lunasol$ gmodproj help
-Garry's Mod Project Manager :: 0.2.0 Pre-alpha
+Garry's Mod Project Manager :: 0.4.0 Pre-alpha
+Syntax:         gmodproj [flags] [command]
 
-Syntax:     gmodproj [command]
+Examples:       gmodproj bin prebuild
+                gmodproj build production
+                gmodproj new addon novacbn my-addon
 
-Examples:   gmodproj build production
-            gmodproj new addon novacbn my-addon
-            gmodproj run prebuild
+Flags:
+        -q, --quiet                             Disables logging to console
+        -nc, --no-cache                         Disables caching of built project files
+        -nf, --no-file                          Disables logging to files
 
 Commands:
-    help                            Shows this help prompt
-    new <template> <author> <name>  Creates a new directory for your project's with a template layout
-                                        'addon', 'gamemode', 'package'
-
-    build [mode]                    Builds your project into distributable Lua files
-                                        (DEFAULT) 'development', 'production'
-    script <script>                 Runs a specified script from your project manifest's 'Scripts'
+        bin <script>                            Executes a utility script located in your project's 'bin' directory
+        build [mode]                            Builds your project into distributable Lua files
+                                                        (DEFAULT) 'development', 'production'
+        new <template> <author> <name>          Creates a new directory for your project via a template
+                                                        'addon', 'gamemode', 'package'
+        version                                 Displays the version text of application
 ```
 
 ## Building From Source
@@ -74,7 +77,7 @@ Commands:
 * `curl` - Requires `curl` to download files, if building from source on Windows.
 * `wget` - Requires `wget` to download files, if building from source on Linux.
 * `luvit` - Requires [luvit](https://luvit.io/) binaries to be present in the project's `/bin` directory.
-* `gmodproj` - Requires a pre-built version of `gmodproj` to be present in the project's "/bin" directory.
+* `gmodproj` - Requires a pre-built version of `gmodproj` to be present in the project's `/bin` directory.
 * **_(OPTIONAL)_** `upx` - If using `gmodproj script buildDistributable production` to build, it will automatically detect if [upx](https://upx.github.io/) is in the `/bin` directory and use it.
 
 #### Building
