@@ -8,7 +8,8 @@ else
     BUILD_MODE="production"
 fi
 
-if [ $BUILD_MODE="production" ]; then
+if [ $BUILD_MODE = "production" ]; then
+    echo "hi"
     BUILD_BINARY="gmodproj.x64.Linux"
 else
     BUILD_BINARY="gmodproj-dev.x64.Linux"
