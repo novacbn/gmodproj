@@ -1,11 +1,40 @@
-language: bash
+language: generic
+os:
+  - linux
+  - osx
 
 branches:
   only:
     - master
+    - latest
+    - /^(\d+\.)?(\d+\.)?(\d+)$/
 
 env:
   - GMODPROJ_BUILD_MODE=development
 
+install:
+  - sh ./bin/bootstrap.sh
+
+before_script:
+  - ./bin/luvi --version || true
+  - ./bin/luvit --version || true
+  - ./bin/gmodproj version
+
 script:
-  - sh ./bin/buildSource.sh
+  - ./bin/gmodproj bin build development
+
+after_success:
+  - ./bin/gmodproj bin build production
+
+deploy:
+  provider: releases
+  api_key:
+    secure: EXnKaKxdo3pj/dm7Zz+4TPLpsb8vUd64iA68EvWbL55uMKj4xL/4fxahxvcNrDYpGYTKP/QDrbEcRKOpGuh+Jv8SGn2xFup2zT7DDNyoL2qKRemZpjEm0PIlcDU5wkVU2ZvcQYj4xAdZZY5OsihTD21kKm2wctDW9McFiSiarvL0LQSJjIpvl3rIoha3wPOnpEnDs1cjB7aVsJuOiH8cJ9UO1dd+D+xT9NRXwJ7X027asXywfMoGL0tj6oe3D77CuiM7293rC7+2FyzL/YNXaPnKY3nOGcjjgwX93meX6hW6mfxlL/yr6k4IVzsVqDuJrSk4N9T0HLdN06cd27x4milL0of+OCqGsPk90+MVjNAZWKdjwGcLrTNhoHcqbxTFOfhNVqUEGN3t3LrkoJT5fM3USwzWrsEej5HgVOPcpLN+MYYaVD41qhf8kE+J5rBNn75+m8C4DtkekuDQ5y6P1LX6eiPgikHIOoPbBYgynL9zCrByn6lcCCmyRSZUiETzT9Q3Y/GfPoDiNino8W6eeoHyHSc1hkCEXEY/zvg9HZepPp9p8R+KmaXUB28w+gkKD+F/MQwrehtdu3i97byZ5kVyJO102CoZAuTHdkRrbivsHsB8/tKDNkdG9rY1Otnns8sjZGUi2y9oVWIppG8KMFRqEC/wK1NsmtViJksS1QU=
+  draft: false
+  prerelease: false
+  file_glob: true
+  file: dist/*
+  on:
+    repo: novacbn/gmodproj
+    tags: true
+  skip_cleanup: true

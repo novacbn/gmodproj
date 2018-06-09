@@ -1,8 +1,15 @@
 # gmodproj changelog
 
 ## 0.4.1
-* Fixed project creation via `gmodproj new`
+* (EXPERIMENTAL) Added macOS builds added via TravisCI
+    * Note, I don't have a macOS device to test on. Therefore will not be able to really help with macOS specific issues
+* Added `_G::SYSTEM_UNIX_LIKE -> boolean`, `_G::assert(any ...) -> any ...`, and `_G::error(string err, number level) -> void` to `novacbn/gmodproj/ScriptingEnvironment::ChunkEnvironment`
+* Updated `gmodproj.lua` builds, now platform specific in distribution
 * Updated CI scripts for `0.4.0`
+* Updated formatting for `gmodproj bin` executions
+    * `-1` status code is reserved for Lua and MoonScript files with syntax errors
+* Updated `novacbn/gmodproj/commands/bin` to use `_G::loadfile` and `moonscript/base::loadfile` for better handling of scripts
+* Fixed project creation via `gmodproj new`
 
 ## 0.4.0
 * Added the `is_key_pair` for keypair validation using `novacbn/gmodproj/api/Schema`
