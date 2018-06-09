@@ -35,6 +35,6 @@ deploy:
   file_glob: true
   file: dist/*
   on:
-    repo: novacbn/gmodproj-dev
+    repo: novacbn/gmodproj
     tags: true
   skip_cleanup: true
