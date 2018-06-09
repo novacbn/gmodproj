@@ -39,6 +39,11 @@ export SYSTEM_OS_ARCH = arch
 -- export
 export SYSTEM_OS_TYPE = os
 
+-- ::SYSTEM_UNIX_LIKE -> string
+-- Represents if the operating system is unix-like in its environment
+-- export
+export SYSTEM_UNIX_LIKE = os == "Linux" or os == "OSX"
+
 -- ::PROJECT_PATH -> table
 -- Represents a map of paths for stored project data
 -- export

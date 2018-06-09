@@ -9,5 +9,32 @@ branches:
 environment:
   GMODPROJ_BUILD_MODE: development
 
+install:
+  - bin\bootstrap.bat
+
+before_build:
+  - bin\luvi --version & exit 0
+  - bin\luvit --version & exit 0
+  - bin\gmodproj version
+
 build_script:
-  - bin\buildSource.bat
+  - bin\gmodproj bin build development
+
+after_test:
+  - bin\gmodproj bin build production
+
+artifacts:
+  - path: dist\*
+    name: build
+
+deploy:
+  - provider: GitHub
+    auth_token:
+      secure: "it5dPgEDzW8I81FnGC/hJxdStM8qMNzoVBNpecrLDc27GhbKjyvIh81ohaw5tI7O"
+    artifact: build
+    draft: false
+    prerelease: false
+    force_update: true
+    on:
+      branch: master
+      appveyor_repo_tag: true  
