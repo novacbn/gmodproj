@@ -15,7 +15,7 @@ userHome = switch os
 -- ::APPLICATION_CORE_VERSION -> table
 -- Represents the current version of the application
 -- export
-export APPLICATION_CORE_VERSION = {0, 4, 0}
+export APPLICATION_CORE_VERSION = {0, 4, 1}
 
 -- ::ENV_ALLOW_UNSAFE_SCRIPTING -> boolean
 -- Represents a environment variable flag if gmodproj should allow unsafe scripting
