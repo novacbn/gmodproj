@@ -1330,7 +1330,7 @@ end\
 APPLICATION_CORE_VERSION = {\
   0,\
   4,\
-  0\
+  1\
 }\
 ENV_ALLOW_UNSAFE_SCRIPTING = isAffirmative(getenv(\"GMODPROJ_ALLOW_UNSAFE_SCRIPTING\") or \"y\")\
 MAP_DEFAULT_PLUGINS = {\

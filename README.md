@@ -1,13 +1,7 @@
 # gmodproj
-###### **[Releases](https://github.com/novacbn/gmodproj/releases) &bullet;**
+[![Build status](https://ci.appveyor.com/api/projects/status/8p7qgdoxvt7smodx?svg=true)](https://ci.appveyor.com/project/novacbn/gmodproj) [![Build Status](https://travis-ci.org/novacbn/gmodproj.svg)](https://travis-ci.org/novacbn/gmodproj)
+**[Releases](https://github.com/novacbn/gmodproj/releases) &bullet;**
 A simple to get started, but easy to hack, project manager for Garry's Mod
-
-## Build Status
-| Operating System | Service | Status |
-| ------------- |:-------------:| -----:|
-| Linux-x64     | TravisCI      | [![Build Status](https://travis-ci.org/novacbn/gmodproj.svg)](https://travis-ci.org/novacbn/gmodproj) |
-| Windows-x64   | AppVeyor      | [![Build status](https://ci.appveyor.com/api/projects/status/8p7qgdoxvt7smodx?svg=true)](https://ci.appveyor.com/project/novacbn/gmodproj) |
-
 
 ## Current Status
 `gmodproj` is currently in `pre-alpha`, and is recommended only for experimentation and testing purposes only! So keep this in mind:
@@ -21,10 +15,10 @@ With that said however, `gmodproj` does support these features:
 * Creating new projects with `gmodproj new`, allowing you to quickly bootstrap various types of Garry's Mod projects without boilerplate or configuration.
 * Projects can be built with `gmodproj build [development/production]` into self-contained distributable `.lua` files. **_(`gmodproj` is self-hosted as an example)_**
     * Builds are also incremental, no rebuilding the entire project slowing down the process.
-* A per-package `packages` folder that allows your to seperate your external dependencies with your internal ones.
+* A per-project `packages` folder that allows your to seperate your external dependencies with your internal ones.
     * You can also specifiy more search paths for packages in your project's manifest!
-* Run `MoonScript` code as defined in your project's `manifest.gmodproj` for task automation.
-    * You can also define your scripts as strings instead of function bodies, they will be ran in your Operating System's shell scripting interpreter.
+* Run `.lua` and `.moon` files from your project's `bin` directory in `gmodproj`'s scripting environment via `gmodproj bin <script> <...>` for task automation.
+    * Can also run operating system `.sh` _(Linux/macOS)_ and `.bat` _(Windows)_ files aswell.
 * Easily extendable with plugins, see [gmodproj-plugin-builtin](httsp://github.com/novacbn/gmodproj-plugin-builtin) as a sample plugin. Which also powers the built-in functionality of `gmodproj`
     * Just put built plugins in your project's `.gmodproj/plugins` directory or for all your projects, `%APPDATA%\.gmodproj\plugins` _(Windows)_ or `~/.gmodproj/plugins` _(Linux)_
     * Then enable them in your `manifest.gmodproj`, see `gmodproj`'s own [manifest.gmodproj](https://github.com/novacbn/gmodproj/blob/master/manifest.gmodproj) as an example.
@@ -51,7 +45,7 @@ First you need to grab the latest release from the [Releases](https://github.com
 ## CLI Options
 ```shell
 novacbn@lunasol$ gmodproj help
-Garry's Mod Project Manager :: 0.4.0 Pre-alpha
+Garry's Mod Project Manager :: 0.4.1 Pre-alpha
 Syntax:         gmodproj [flags] [command]
 
 Examples:       gmodproj bin prebuild
@@ -75,14 +69,15 @@ Commands:
 ## Building From Source
 #### Prerequitises
 * `curl` - Requires `curl` to download files, if building from source on Windows.
-* `wget` - Requires `wget` to download files, if building from source on Linux.
+* `wget` - Requires `wget` to download files, if building from source on macOS/Linux.
 * `luvit` - Requires [luvit](https://luvit.io/) binaries to be present in the project's `/bin` directory.
+    * Automatically retrieved and built if using `./bin/bootstrap.sh` _(or `bin\bootstrap.bat` if on Windows)_
 * `gmodproj` - Requires a pre-built version of `gmodproj` to be present in the project's `/bin` directory.
-* **_(OPTIONAL)_** `upx` - If using `gmodproj script buildDistributable production` to build, it will automatically detect if [upx](https://upx.github.io/) is in the `/bin` directory and use it.
+* **_(OPTIONAL)_** `upx` - If using `gmodproj bin build production` to build, it will automatically detect if [upx](https://upx.github.io/) is in the `/bin` directory and use it.
 
 #### Building
 * Navigate to your copy of `gmodproj`'s source code directory in a terminal.
-* In your terminal, type `./bin/buildSource.sh` _(or `bin\buildSource.bat` if on Windows)_
+* In your terminal, type `./bin/bootstrap.sh` _(or `bin\bootstrap.bat` if on Windows)_
     * It will automatically download and build the prerequitises files, then compile `gmodproj`
 * Once complete, a new `gmodproj` _(or `gmodproj.exe` if on Windows)_ will be located in your `/bin` directory.
 
@@ -135,8 +130,6 @@ By default, `gmodproj` also supports the following data markups:
 * `.toml`           - Tom's Obvious Minimal Language, a simple configuration format, compiled to a Lua table at build time.
 * `.lprop`          - Lua-based human-readable properties format, using standard Lua table syntax.
 * `.mprop`          - MoonScript-based human-readable properties format, using standard MoonScript table syntax.
-* `.gmodmanifest`   - Same as `.mprop`, allows importation of project files.
-* `.gmodpackages`   - Same as `.mprop`, allows importation of project files.
 
 #### Do MoonScript files handle imports differently than Lua files?
 Ever so slightly, yes. As seen in the `gmodproj` codebase, MoonScript allows for slightly streamlined importing:
@@ -172,6 +165,7 @@ Yes to both, this is planned for the future.
 
 ## Dependencies/Third-Party
 
+* [creationix/luvit](https://luvit.io/)
 * [davidm/lua-glob-pattern](https://github.com/davidm/lua-glob-pattern)
 * [fperrad/lua-LIVR](https://github.com/fperrad/lua-LIVR)
 * [leafo/moonscript](https://github.com/leafo/moonscript)
