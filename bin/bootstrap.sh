@@ -1,35 +1,30 @@
 #!/usr/bin/env sh
 set -e
 
-# Configuration for the build
+# Use environment variable for build mode if set
 if [ -n $GMODPROJ_BUILD_MODE ]; then
     BUILD_MODE=$GMODPROJ_BUILD_MODE
 else
     BUILD_MODE="production"
 fi
 
-if [ $BUILD_MODE = "production" ]; then
-    echo "hi"
-    BUILD_BINARY="gmodproj.x64.Linux"
-else
-    BUILD_BINARY="gmodproj-dev.x64.Linux"
-fi
-
 # Dependent versions prerequisites
-LUVI_VERSION="2.7.6"
 LIT_VERSION="3.5.4"
-GMODPROJ_VERSION="0.4.0"
+LUVI_VERSION="2.7.6"
 
 # Download urls for prerequisites
-LUVI_URL="https://github.com/luvit/luvi/releases/download/v$LUVI_VERSION/luvi-regular-Linux_x86_64"
 LIT_URL="http://lit.luvit.io/packages/luvit/lit/v$LIT_VERSION.zip"
-GMODPROJ_URL="https://github.com/novacbn/gmodproj/releases/download/$GMODPROJ_VERSION/gmodproj.x64.Linux"
+if [ "$(uname)" = "Darwin" ]; then
+    LUVI_URL="https://github.com/luvit/luvi/releases/download/v$LUVI_VERSION/luvi-regular-Darwin_x86_64"
+
+else
+    LUVI_URL="https://github.com/luvit/luvi/releases/download/v$LUVI_VERSION/luvi-regular-Linux_x86_64"
+fi
 
 # Download prerequisites
 echo "Downloading prerequisite files..."
 wget -nv -O ./bin/luvi $LUVI_URL
 wget -nv -O ./bin/lit.zip $LIT_URL
-wget -nv -O ./bin/gmodproj $GMODPROJ_URL
 
 # Make luvit
 echo "\n\nMaking luvit"
@@ -41,9 +36,7 @@ cd ../
 
 # Make gmodproj
 echo "\n\nMaking gmodproj"
-chmod +x ./bin/gmodproj
-./bin/gmodproj bin build $BUILD_MODE
-mv -f ./dist/$BUILD_BINARY ./bin/gmodproj
+./bin/luvi ./build -m main.lua -o ./bin/gmodproj ./bin/luvit
 chmod +x ./bin/gmodproj
 
 # Perform cleanup
