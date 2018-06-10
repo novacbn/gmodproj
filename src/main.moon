@@ -14,15 +14,17 @@ APPLICATION_SUB_COMMANDS = {
     build:      dependency "novacbn/gmodproj/commands/build"
     new:        dependency "novacbn/gmodproj/commands/new"
     version:    dependency "novacbn/gmodproj/commands/version"
+    watch:      dependency "novacbn/gmodproj/commands/watch"
 }
 
 -- ::APPLICATION_COMMAND_FLAGS -> table
 -- Represents help text of the usable command line flags
 --
 APPLICATION_COMMAND_FLAGS = {
-    {"-q", "--quiet", "Disables logging to console"}
-    {"-nc", "--no-cache", "Disables caching of built project files"}
-    {"-nf", "--no-file", "Disables logging to files"}
+    {"-q",  "--quiet",          "Disables logging to console"}
+    {"-nc", "--no-cache",       "Disables caching of built project files"}
+    {"-nf", "--no-file",        "Disables logging to files"}
+    {"-ws", "--watch-search",   "Watches package search paths specified in project manifest"}
 }
 
 -- ::PATTERN_FLAG_MINI -> string

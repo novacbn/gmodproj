@@ -1,5 +1,6 @@
 # gmodproj
 [![Build status](https://ci.appveyor.com/api/projects/status/8p7qgdoxvt7smodx?svg=true)](https://ci.appveyor.com/project/novacbn/gmodproj) [![Build Status](https://travis-ci.org/novacbn/gmodproj.svg)](https://travis-ci.org/novacbn/gmodproj)
+
 **[Releases](https://github.com/novacbn/gmodproj/releases) &bullet;**
 A simple to get started, but easy to hack, project manager for Garry's Mod
 

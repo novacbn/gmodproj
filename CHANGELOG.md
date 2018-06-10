@@ -1,5 +1,11 @@
 # gmodproj changelog
 
+## 0.4.2
+* Added `gmodproj watch` command, naively watches your project's `sourceDirectory` (default `./src`) for changes and rebuilds in development mode
+    * Use `-ws` or `--watch-search` to also watch search paths defined in `Resolver.searchPaths` (default `{'./packages'}`)
+* Updated `gmodproj bin`
+    * Operating system scripts no longer exit the `gmodproj` directly, on successful execution
+
 ## 0.4.1
 * (EXPERIMENTAL) Added macOS builds added via TravisCI
     * Note, I don't have a macOS device to test on. Therefore will not be able to really help with macOS specific issues

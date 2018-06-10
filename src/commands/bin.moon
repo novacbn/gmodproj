@@ -11,10 +11,10 @@ import ScriptingEnvironment from "novacbn/gmodproj/lib/ScriptingEnvironment"
 import configureEnvironment, readManifest from "novacbn/gmodproj/lib/utilities"
 import execFormat, isFile from "novacbn/gmodproj/lib/utilities/fs"
 
--- ::TEMPLATE_EXECUTION_SUCCESS(string script, number status) -> string
+-- ::TEMPLATE_EXECUTION_SUCCESS(string script) -> string
 -- Formats a successful script execution
 --
-TEMPLATE_EXECUTION_SUCCESS = (script, status) -> "Successfully executed '#{script}' (#{status})"
+TEMPLATE_EXECUTION_SUCCESS = (script) -> "Successfully executed '#{script}'"
 
 -- ::TEMPLATE_EXECUTION_ERROR(string script) -> string
 -- Formats failed script execution with an unexpected error
@@ -102,7 +102,7 @@ export executeCommand = (flags, script, ...) ->
             success, status, stdout = shellLoader(...)
             if success then
                 print(stdout)
-                logInfo(TEMPLATE_EXECUTION_SUCCESS(script, status), {exit: status})
+                logInfo(TEMPLATE_EXECUTION_SUCCESS(script))
 
             else
                 logError(stdout)
