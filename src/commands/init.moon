@@ -99,7 +99,7 @@ export executeCommand = wrap((flags) ->
             "Entry point ##{index}",
             => match(@, PATTERN_MODULE_NAMESPACE),
             "namespace must contain only alphanumeric characters, dashes, slashes, and underscores",
-            "main"
+            "#{projectAuthor}/#{projectName}/main"
         )
 
         endPoint                    = prompt("End point ##{index}", "#{projectAuthor}.#{projectName}.#{basename(entryPoint)}")
