@@ -26,12 +26,12 @@ export formatDescription = (flags) ->
     return "watch [script]\t\t\t\tWatches the source directory for changes and rebuilds in development\n\t\t\t\t\t\t\tExecutes the a script instead, if specified"
 
 -- ::executeCommand(table flags, string script?) -> void
--- Prints the version of the application to console
+-- Watches the project's source directory, and search paths if specified, for rebuilding
 -- export
 export executeCommand = (flags, script, ...) ->
     options = readManifest()
 
-    -- Retrieve the 'gmodproj bin' binding if a script is specified, otherwise use a 'gmodproj build development' binding
+    -- Retrieve the 'gmodproj bin [script] [...]' binding if a script is specified, otherwise use a 'gmodproj build development' binding
     modificationBind = makeBinding(flags, script, ...)
 
     -- Start watching the source directory for modifications

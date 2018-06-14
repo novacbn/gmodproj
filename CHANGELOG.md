@@ -1,8 +1,16 @@
 # gmodproj changelog
 
 ## 0.4.2
+* Added `gmodproj clean` command, empties the `.gmodproj/cache` build cache directory of your project
+    * Use `-ca` or `--clean-all` to enable all cleaning modes
+    * Use `-cl` or `--clean-logs` to enable cleaning of the `.gmodproj/logs` directory of your project
+    * Use `-nc` or `--no-cache` to disable cleaning of `.gmodproj/cache` directory
+    * Use `-nl` or `--no-logs` to disable cleaning of `gmodproj/logs` directory of your project
+* Added `gmodproj init` command, provides an interactive prompt for initializing an existing project to use `gmodproj`
 * Added `gmodproj watch` command, naively watches your project's `sourceDirectory` (default `./src`) for changes and rebuilds in development mode
     * Use `-ws` or `--watch-search` to also watch search paths defined in `Resolver.searchPaths` (default `{'./packages'}`)
+* Deprecated command line option `-nf`/`--no-file`, to be merged with `-nl`/`--no-logs` in `0.5.0`
+* Updated cli to be more consistent
 * Updated `gmodproj bin`
     * Operating system scripts no longer exit the `gmodproj` directly, on successful execution
 

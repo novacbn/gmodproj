@@ -12,6 +12,8 @@ import logFatal, logInfo, toggleConsoleLogging, toggleFileLogging from "novacbn/
 APPLICATION_SUB_COMMANDS = {
     bin:        dependency "novacbn/gmodproj/commands/bin"
     build:      dependency "novacbn/gmodproj/commands/build"
+    clean:      dependency "novacbn/gmodproj/commands/clean"
+    init:       dependency "novacbn/gmodproj/commands/init"
     new:        dependency "novacbn/gmodproj/commands/new"
     version:    dependency "novacbn/gmodproj/commands/version"
     watch:      dependency "novacbn/gmodproj/commands/watch"
@@ -21,10 +23,13 @@ APPLICATION_SUB_COMMANDS = {
 -- Represents help text of the usable command line flags
 --
 APPLICATION_COMMAND_FLAGS = {
-    {"-q",  "--quiet",          "Disables logging to console"}
-    {"-nc", "--no-cache",       "Disables caching of built project files"}
-    {"-nf", "--no-file",        "Disables logging to files"}
-    {"-ws", "--watch-search",   "Watches package search paths specified in project manifest"}
+    {"-ca", "--clean-all",      "\t\t\tEnables cleaning of all generated project files"}
+    {"-cl", "--clean-logs",     "\t\t\tEnables cleaning of project log files"}
+    {"-nc", "--no-cache",       "\t\t\t\tDisables caching and cleaning of built project files"}
+    {"-nf", "--no-file",        "\t\t\t\tDisables logging to files"}
+    {"-nl", "--no-logs",        "\t\t\t\tDisables cleaning of project log files"}
+    {"-q",  "--quiet",          "\t\t\t\tDisables output to console"}
+    {"-ws", "--watch-search",   "\t\t\tEnables watching package search paths specified in project manifest"}
 }
 
 -- ::PATTERN_FLAG_MINI -> string
@@ -64,7 +69,7 @@ displayHelpText = (flags) ->
     commandsText    = concat(commandsText, "\n")
     
     -- Format the application command flags
-    flagsText   = ["\t#{flag[1]}, #{flag[2]}\t\t\t\t#{flag[3]}" for flag in *APPLICATION_COMMAND_FLAGS]
+    flagsText   = ["\t#{flag[1]}, #{flag[2]}#{flag[3]}" for flag in *APPLICATION_COMMAND_FLAGS]
     flagsText   = concat(flagsText, "\n")
 
     print(TEMPLATE_TEXT_HELP(TEXT_COMMAND_VERSION, commandsText, flagsText))

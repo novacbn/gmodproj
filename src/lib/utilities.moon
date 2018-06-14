@@ -1,4 +1,5 @@
 import pcall from _G
+import resume, running, yield from coroutine
 
 import readFileSync, mkdirSync from require "fs"
 
@@ -20,6 +21,15 @@ export configureEnvironment = () ->
     mkdirSync(PROJECT_PATH.logs) unless isDir(PROJECT_PATH.logs)
 
     enableFileLogging()
+
+-- ::makeSync(function func) -> function
+-- Makes a coroutine synchronus function out of a Luvit-style callback API
+-- export
+export makeSync = (func) ->
+    return (...) ->
+        thread = running()
+        func(..., (...) -> resume(thread, ...))
+        return yield()
 
 -- ::readManifest() -> table
 -- Reads the project's manifest file, fatally exits process on errors
