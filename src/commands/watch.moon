@@ -23,7 +23,7 @@ makeBinding = (flags, script, ...) ->
 -- Formats the help description of the command
 -- export
 export formatDescription = (flags) ->
-    return "watch [script]\t\t\t\tWatches the source directory for changes and rebuilds in development\n\t\t\t\t\t\t\tExecutes the a script instead, if specified"
+    return "watch [script]\t\t\t\tWatches the source directory for changes and rebuilds in development\n\t\t\t\t\t\t\tExecutes a script instead, if specified"
 
 -- ::executeCommand(table flags, string script?) -> void
 -- Watches the project's source directory, and search paths if specified, for rebuilding
