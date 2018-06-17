@@ -13,7 +13,7 @@
     * In your utility scripts, define tests like
     ```lua
     define("mytest", function ()
-        mypackage = require("../dist/mypackage")
+        mypackage = require("dist/mypackage")
         assert(type(mypackage.add(1, 2)) == "number")
     end)
     ```
