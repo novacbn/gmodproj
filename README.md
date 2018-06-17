@@ -7,15 +7,15 @@ A simple to get started, but easy to hack, project manager for Garry's Mod
 ## Current Status
 `gmodproj` is currently in `pre-alpha`, and is recommended only for experimentation and testing purposes only! So keep this in mind:
 * Documentation is sorely lacking, that's **next priority**!
-* `.gmodmanifest` and `.gmodpackages` files are both not standardized as-of yet. In the future these may break.
-* `gmodproj` does not support a watch mode yet, so `gmodproj build` must be ran manually.
+* `.gmodmanifest` and `.gmodpackages` files are both not stablized as-of yet. In the future these may break.
 * Remote package installation is not supported as-of yet, packages must be manually installed to your project's `packages` folder _(or other specified search paths)_.
-* The API for extending `gmodproj` with installable packages is also not standardized, so any current extensions may also break.
+* The API for extending `gmodproj` with installable packages is also not stablized, so any current extensions may also break.
 
 With that said however, `gmodproj` does support these features:
 * Creating new projects with `gmodproj new`, allowing you to quickly bootstrap various types of Garry's Mod projects without boilerplate or configuration.
 * Projects can be built with `gmodproj build [development/production]` into self-contained distributable `.lua` files. **_(`gmodproj` is self-hosted as an example)_**
     * Builds are also incremental, no rebuilding the entire project slowing down the process.
+    * Automatically build when you edit a project file with `gmodproj watch [script]`
 * A per-project `packages` folder that allows your to seperate your external dependencies with your internal ones.
     * You can also specifiy more search paths for packages in your project's manifest!
 * Run `.lua` and `.moon` files from your project's `bin` directory in `gmodproj`'s scripting environment via `gmodproj bin <script> <...>` for task automation.
@@ -54,17 +54,25 @@ Examples:       gmodproj bin prebuild
                 gmodproj new addon novacbn my-addon
 
 Flags:
-        -q, --quiet                             Disables logging to console
-        -nc, --no-cache                         Disables caching of built project files
+        -ca, --clean-all                        Enables cleaning of all generated project files
+        -cl, --clean-logs                       Enables cleaning of project log files
+        -nc, --no-cache                         Disables caching and cleaning of built project files
         -nf, --no-file                          Disables logging to files
+        -nl, --no-logs                          Disables cleaning of project log files
+        -q, --quiet                             Disables output to console
+        -ws, --watch-search                     Enables watching package search paths specified in project manifest
 
 Commands:
         bin <script>                            Executes a utility script located in your project's 'bin' directory
         build [mode]                            Builds your project into distributable Lua files
                                                         (DEFAULT) 'development', 'production'
+        clean                                   Cleans the build cache of the project
+        init                                    Initializes an already existing project to work with gmodproj
         new <template> <author> <name>          Creates a new directory for your project via a template
                                                         'addon', 'gamemode', 'package'
         version                                 Displays the version text of application
+        watch [script]                          Watches the source directory for changes and rebuilds in development
+                                                        Executes a script instead, if specified
 ```
 
 ## Building From Source
