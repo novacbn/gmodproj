@@ -3,6 +3,7 @@ import
     pairs, setfenv
 from _G
 import match from string
+import insert from table
 
 import
     existsSync, mkdirSync, readFileSync, writeFileSync,
@@ -14,6 +15,7 @@ import merge from "novacbn/novautils/table"
 
 import SYSTEM_OS_ARCH, SYSTEM_OS_TYPE, SYSTEM_UNIX_LIKE from "novacbn/gmodproj/lib/constants"
 import fromString, toString from "novacbn/gmodproj/lib/datafile"
+import logError from "novacbn/gmodproj/lib/logging"
 import exec, execFormat, isDir, isFile from "novacbn/gmodproj/lib/utilities/fs"
 assertx = dependency "novacbn/gmodproj/lib/utilities/assert"
 
@@ -22,12 +24,23 @@ assertx = dependency "novacbn/gmodproj/lib/utilities/assert"
 ChunkEnvironment = (environmentRoot, allowUnsafe) ->
     -- ::getEnvironmentPath(string path) -> string or nil
     -- Normalizes a path to be relative to the scripting environment's working directory only, errors otherwise if unsafe scripting is disabled
+    --
     getEnvironmentPath = (path) ->
         -- Only return pathes as relative to the project directory
         return join(environmentRoot, path) unless isAbsolute(path) or match(path, "%.%.")
 
         -- Only return unsafe pathes if allowed
         return path if allowUnsafe
+
+    -- ::orderedTests -> table
+    -- Represents the defined unit tests ordered as defined
+    --
+    orderedTests = {}
+
+    -- ::unitTests -> table
+    -- Represents the defined unit tests
+    --
+    unitTests = {}
 
     local environmentTable
     environmentTable = {
@@ -55,6 +68,20 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
         -- Lua's built-in assert function
         -- scripting, safe
         assert: assert
+
+        -- ChunkEnvironment::define(string name, function callback) -> void
+        -- Defines a unit test to be dispatched when `_G::test` is called
+        -- scripting, safe
+        define: (name, callback) ->
+            error("bad argument #1 to 'define' (expected string)") unless type(name) == "string"
+            error("bad argument #1 to 'define' (test already defined)") if unitTests[name]
+            error("bad argument #2 to 'define' (expected function)") unless type(callback) == "function"
+
+            unitTests[name] = true
+            insert(orderedTests, {
+                name:       name
+                callback:   callback
+            })
 
         -- ChunkEnvironment::error(string error, number level) -> void
         -- Lua's built-in error function
@@ -149,6 +176,30 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
             else unlinkSync(path)
             return nil
 
+        -- ChunkEnvironment::test() -> number, string
+        -- Dispatches all the define tests, printing each failed test
+        -- scripting, safe
+        test: () ->
+            local success, err
+            for unitTest in *orderedTests
+                success, err        = pcall(unitTest.callback)
+                unitTest.success    = success
+
+                unless success
+                    logError("Failed unit test '#{unitTest.name}'\n#{err}")
+                    print("")
+
+            -- Calculate all the number of successful tests
+            failed      = 0
+            successful  = 0
+            total       = #orderedTests
+            for unitTest in *orderedTests
+                if unitTest.success then successful += 1
+                else failed += 1
+
+            return 1, "#{successful} successes, #{failed} failed, out of #{total} test(s)" if failed > 0
+            return 0, "All #{total} test(s) passed"
+
         -- ChunkEnvironment::tostring(any value) -> string
         -- Lua's built-in tostring function
         -- scripting, safe
@@ -195,6 +246,7 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
 
         -- ChunkEnvironment::execFormat(string ...) -> boolean, number or nil, string or nil
         -- Executes the shell command if shell and returns the STDOUT and status code, formatting the vararg
+        -- scripting, unsafe
         execFormat: execFormat
     })
 
@@ -202,17 +254,21 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
 
 -- ScriptingEnvironment::ScriptingEnvironment()
 -- Represents a pseudo-sandboxed environment to run scripts in
+-- export
 export class ScriptingEnvironment
     -- ScriptingEnvironment::allowUnsafe -> boolean
     -- Represents if the scripting environment allows for unsafe operations
+    --
     allowUnsafe: nil
 
     -- ScriptingEnvironment::environmentRoot -> string
     -- Represents the root path of the scripting environment, that scripts can interact with
+    --
     environmentRoot: nil
 
     -- ScriptingEnvironment::new(string environmentRoot, boolean allowUnsafe)
     -- Constructor for ScriptingEnvironment
+    --
     new: (environmentRoot, allowUnsafe) =>
         -- Store the environment variables
         @allowUnsafe        = allowUnsafe
@@ -220,6 +276,7 @@ export class ScriptingEnvironment
 
     -- ScriptingEnvironment::executeChunk(function scriptChunk, any ...) -> boolean, string or any ...
     -- Wraps the script chunk in a pseudo-sandboxed environment, then executes with, returning its results
+    --
     executeChunk: (scriptChunk, ...) =>
         -- Make a new environment for the executing chunk, then run it
         environmentSandbox = ChunkEnvironment(@environmentRoot, @allowUnsafe)

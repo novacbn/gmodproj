@@ -9,7 +9,21 @@
 * Added `gmodproj init` command, provides an interactive prompt for initializing an existing project to use `gmodproj`
 * Added `gmodproj watch` command, naively watches your project's `sourceDirectory` (default `./src`) for changes and rebuilds in development mode
     * Use `-ws` or `--watch-search` to also watch search paths defined in `Resolver.searchPaths` (default `{'./packages'}`)
+* Added `_G::define(string description, function callback) -> void` and `_G::test() -> number, string` to `novacbn/gmodproj/ScriptingEnvironment::ChunkEnvironment` for simple unit testing
+    * In your utility scripts, define tests like
+    ```lua
+    define("mytest", function ()
+        mypackage = require("../dist/mypackage")
+        assert(type(mypackage.add(1, 2)) == "number")
+    end)
+    ```
+
+    * Then dispatch `_G::test()` at your script's footer, it will handle return status and message
+    ```lua
+    return test()
+    ```
 * Deprecated command line option `-nf`/`--no-file`, to be merged with `-nl`/`--no-logs` in `0.5.0`
+* Updated [novacbn/gmodproj-plugin-builtin](https://github.com/novacbn/gmodproj-plugin-builtin) to `0.2.1`, fixes [#14](https://github.com/novacbn/gmodproj/issues/14)
 * Updated cli to be more consistent
 * Updated `gmodproj bin`
     * Operating system scripts no longer exit the `gmodproj` directly, on successful execution
