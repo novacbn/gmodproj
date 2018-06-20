@@ -1,6 +1,6 @@
 import
-    assert, error, ipairs, pcall,
-    pairs, setfenv
+    assert, error, ipairs, loadfile,
+    pcall, pairs, setfenv
 from _G
 import match from string
 import insert from table
@@ -10,10 +10,11 @@ import
     unlinkSync from require "fs"
 import decode, encode from require "json"
 import isAbsolute, join from require "path"
+moonscript = require "moonscript"
 
 import merge from "novacbn/novautils/table"
 
-import SYSTEM_OS_ARCH, SYSTEM_OS_TYPE, SYSTEM_UNIX_LIKE from "novacbn/gmodproj/lib/constants"
+import PROJECT_PATH, SYSTEM_OS_ARCH, SYSTEM_OS_TYPE, SYSTEM_UNIX_LIKE from "novacbn/gmodproj/lib/constants"
 import fromString, toString from "novacbn/gmodproj/lib/datafile"
 import logError from "novacbn/gmodproj/lib/logging"
 import exec, execFormat, isDir, isFile from "novacbn/gmodproj/lib/utilities/fs"
@@ -32,6 +33,11 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
         -- Only return unsafe pathes if allowed
         return path if allowUnsafe
 
+    -- ::moduleCache -> table
+    -- Represents the module cached by `require`
+    --
+    moduleCache = {}
+
     -- ::orderedTests -> table
     -- Represents the defined unit tests ordered as defined
     --
@@ -48,6 +54,11 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
         -- Represents if unsafe scripting is allowed by the user
         -- scripting, safe
         ENV_ALLOW_UNSAFE_SCRIPTING: allowUnsafe
+
+        -- ChunkEnvironment::PROJECT_PATH -> table
+        -- Represents the various paths of the current project
+        -- scripting, safe
+        PROJECT_PATH: PROJECT_PATH
 
         -- ChunkEnvironment::SYSTEM_OS_ARCH -> boolean
         -- Represents the architecture of the operating system
@@ -234,10 +245,39 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
         -- scripting, unsafe
         dependency: dependency
 
-        -- ChunkEnvironment::require(string importName) -> any
+        -- ChunkEnvironment::require(string name) -> any
         -- Imports a script from the running 'Luvit' environment
         -- scripting, unsafe
-        require: require
+        require: (name) ->
+            -- Try to find the script within the project directory
+            path    = join(PROJECT_PATH.home, name)
+            loader  = nil
+
+            if isFile(path..".lua")
+                -- If there is a Lua file, provide the Lua loader
+                path    ..= ".lua"
+                loader  = loadfile
+
+            elseif isFile(path..".moon")
+                -- If there is a MoonScript file, provide the MoonScript loader
+                path    ..= ".moon"
+                loader  = moonscript.loadfile
+
+            if loader
+                -- A loader was present, try to load and cache the module
+                unless moduleCache[name]
+                    chunk = loader(path)
+                    setfenv(chunk, environmentTable)
+                    moduleCache[name] = chunk()
+
+                return moduleCache[name]
+
+            -- Try to load the script from gmodproj's included files
+            success, exports = pcall(dependency, name)
+            return exports if success
+
+            -- If all else fails, use Luvit's require
+            return require(name)
 
         -- ChunkEnvironment::exec(string command) -> boolean, number or nil, string or nil
         -- Executes the shell command if shell and returns the STDOUT and status code
@@ -249,6 +289,8 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
         -- scripting, unsafe
         execFormat: execFormat
     })
+
+    environmentTable._G = environmentTable
 
     return setmetatable({}, {__index: environmentTable})
 

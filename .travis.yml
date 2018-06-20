@@ -22,8 +22,9 @@ before_script:
 
 script:
   - ./bin/gmodproj bin build development
+  - ./bin/gmodproj bin test
 
-after_success:
+before_deploy:
   - ./bin/gmodproj bin build production
 
 deploy:

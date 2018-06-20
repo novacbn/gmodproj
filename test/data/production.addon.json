@@ -1,0 +1,9 @@
+{
+  "addons/testaddon/lua/autorun/client/testaddon_client.lua":"e83a0eb39b7dcd0015569b0f36480f42103b6766",
+  "src/server.lua":"1f19820363636f87068dd51b8e029da1c8da693b",
+  "src/client.lua":"48d4907d8f0dd2db45fcb619b6ffb1e327e2d409",
+  "addons/testaddon/addon.json":"611a80191e46d5f3885c34557580604a9ddf5042",
+  ".gmodmanifest":"6ef9a64e98b5822688ea81930ca35052eab9876a",
+  "src/shared.lua":"5a70d21e41c0fa0ab2cc4efdcf2616458b91e96a",
+  "addons/testaddon/lua/autorun/server/testaddon_server.lua":"c0af662b3075f956ae65826000e2b030bc2c6f42"
+}

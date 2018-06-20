@@ -1,5 +1,17 @@
 # gmodproj changelog
 
+## 0.4.3
+* Added testing for these CLI commands
+    * `gmodproj build`
+    * `gmodproj new`
+* Added the following bindings to `novacbn/gmodproj/lib/ScriptingEnvironment::ChunkEnvironment`
+    * `novacbn/gmodproj/lib/constants::PROJECT_PATH`
+* Updated the following bindings for `novacbn/gmodproj/lib/ScriptingEnvironment::ChunkEnvironment`
+    * `_G::require(string name) -> any` - Now searches for scripts in the following order: project directory, gmodproj modules, Luvit modules
+        * Supports `.moon` files in the project directory
+* Updated bootstrap `gmodproj` to 0.4.3-indev
+* Updated CI to use test suite
+
 ## 0.4.2
 * Added `gmodproj clean` command, empties the `.gmodproj/cache` build cache directory of your project
     * Use `-ca` or `--clean-all` to enable all cleaning modes

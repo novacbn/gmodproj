@@ -1,0 +1,9 @@
+{
+  "gamemodes/testgamemode/gamemode/init.lua":"0b0b8eda840c4741992fa05f94f987957ce33e50",
+  "src/shared.lua":"5a70d21e41c0fa0ab2cc4efdcf2616458b91e96a",
+  "src/client.lua":"541828f685d7d0878105249701213ec105a47d95",
+  "src/server.lua":"889a5c846f39b13b7f3c32d94cc47efa4038fe80",
+  ".gmodmanifest":"d697c9f1443c53f7ca7546fe4f292bf1cebbd099",
+  "gamemodes/testgamemode/testgamemode.txt":"efa9a7b75cda0e3e18a9a18cdcc986ac7262b5d2",
+  "gamemodes/testgamemode/gamemode/cl_init.lua":"41270d8d393c036c5b9ab821da4c47a24acbfa2b"
+}

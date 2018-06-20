@@ -885,8 +885,8 @@ do\
   execFormat, isFile = _obj_0.execFormat, _obj_0.isFile\
 end\
 local TEMPLATE_EXECUTION_SUCCESS\
-TEMPLATE_EXECUTION_SUCCESS = function(script, status)\
-  return \"Successfully executed '\" .. tostring(script) .. \"' (\" .. tostring(status) .. \")\"\
+TEMPLATE_EXECUTION_SUCCESS = function(script)\
+  return \"Successfully executed '\" .. tostring(script) .. \"'\"\
 end\
 local TEMPLATE_EXECUTION_ERROR\
 TEMPLATE_EXECUTION_ERROR = function(script)\
@@ -955,9 +955,7 @@ executeCommand = function(flags, script, ...)\
       local success, status, stdout = shellLoader(...)\
       if success then\
         print(stdout)\
-        return logInfo(TEMPLATE_EXECUTION_SUCCESS(script, status), {\
-          exit = status\
-        })\
+        return logInfo(TEMPLATE_EXECUTION_SUCCESS(script))\
       else\
         logError(stdout)\
         return logFatal(TEMPLATE_EXECUTION_FAILED(script, status), {\
@@ -1021,6 +1019,135 @@ executeCommand = function(flags, mode)\
   local elapsedTime = elapsedTimer:getFormattedElapsed()\
   return logInfo(\"Build completed in \" .. tostring(elapsedTime) .. \"!\")\
 end",
+['novacbn/gmodproj/commands/clean'] = "local unlinkSync\
+unlinkSync = require(\"fs\").unlinkSync\
+local join\
+join = require(\"path\").join\
+local PROJECT_PATH\
+PROJECT_PATH = dependency(\"novacbn/gmodproj/lib/constants\").PROJECT_PATH\
+local logInfo\
+logInfo = dependency(\"novacbn/gmodproj/lib/logging\").logInfo\
+local collectFiles, isDir\
+do\
+  local _obj_0 = dependency(\"novacbn/gmodproj/lib/utilities/fs\")\
+  collectFiles, isDir = _obj_0.collectFiles, _obj_0.isDir\
+end\
+local cleanDirectory\
+cleanDirectory = function(directory)\
+  local _list_0 = collectFiles(directory)\
+  for _index_0 = 1, #_list_0 do\
+    local file = _list_0[_index_0]\
+    unlinkSync(join(directory, file))\
+  end\
+end\
+formatDescription = function(flags)\
+  return \"clean\\t\\t\\t\\t\\tCleans the build cache of the project\"\
+end\
+executeCommand = function(flags)\
+  if isDir(PROJECT_PATH.cache) and not (flags[\"-nc\"] or flags[\"--no-cache\"]) then\
+    cleanDirectory(PROJECT_PATH.cache)\
+  end\
+  if isDir(PROJECT_PATH.logs) then\
+    if not (flags[\"-nl\"] or flags[\"--no-logs\"]) and (flags[\"-ca\"] or flags[\"-cl\"] or flags[\"--clean-all\"] or flags[\"--clean-logs\"]) then\
+      cleanDirectory(PROJECT_PATH.logs)\
+    end\
+  end\
+  return logInfo(\"Finished cleaning project files\")\
+end",
+['novacbn/gmodproj/commands/init'] = "local print, tonumber\
+do\
+  local _obj_0 = _G\
+  print, tonumber = _obj_0.print, _obj_0.tonumber\
+end\
+local wrap\
+wrap = coroutine.wrap\
+local match\
+match = string.match\
+local writeFileSync\
+writeFileSync = require(\"fs\").writeFileSync\
+local basename, join\
+do\
+  local _obj_0 = require(\"path\")\
+  basename, join = _obj_0.basename, _obj_0.join\
+end\
+local readLine\
+readLine = require(\"readline\").readLine\
+local encode\
+encode = dependency(\"novacbn/properties/exports\").encode\
+local PROJECT_PATH\
+PROJECT_PATH = dependency(\"novacbn/gmodproj/lib/constants\").PROJECT_PATH\
+local makeSync\
+makeSync = dependency(\"novacbn/gmodproj/lib/utilities\").makeSync\
+local PATTERN_METADATA_NAME, PATTERN_METADATA_REPOSITORY, PATTERN_METADATA_VERSION\
+do\
+  local _obj_0 = dependency(\"novacbn/gmodproj/schemas/ProjectOptions\")\
+  PATTERN_METADATA_NAME, PATTERN_METADATA_REPOSITORY, PATTERN_METADATA_VERSION = _obj_0.PATTERN_METADATA_NAME, _obj_0.PATTERN_METADATA_REPOSITORY, _obj_0.PATTERN_METADATA_VERSION\
+end\
+local PATTERN_MODULE_NAMESPACE = \"^[%w/%-_]+$\"\
+local readLineSync = makeSync(readLine)\
+local prompt\
+prompt = function(question, default)\
+  local err, answer = readLineSync(default and tostring(question) .. \" (\" .. tostring(default) .. \"): \" or tostring(question) .. \": \")\
+  if default then\
+    return answer == \"\" and default or answer\
+  elseif answer == \"\" then\
+    return prompt(question)\
+  else\
+    return answer\
+  end\
+end\
+local validatedPrompt\
+validatedPrompt = function(question, check, err, default)\
+  local answer\
+  while answer == nil do\
+    answer = prompt(question, default)\
+    if not (check(answer)) then\
+      print(\"\\27[31merr:\\27[0m \" .. err)\
+      answer = nil\
+    end\
+  end\
+  return answer\
+end\
+formatDescription = function()\
+  return \"init\\t\\t\\t\\t\\tInitializes an already existing project to work with gmodproj\"\
+end\
+executeCommand = wrap(function(flags)\
+  local directoryName = basename(PROJECT_PATH.home)\
+  local projectName = validatedPrompt(\"Project name\", function(self)\
+    return match(self, PATTERN_METADATA_NAME)\
+  end, \"must start with a letter and contain only lowercase alphanumerical characters and dashes\", match(directoryName, PATTERN_METADATA_NAME) and directoryName)\
+  local projectAuthor = validatedPrompt(\"Project author\", function(self)\
+    return match(self, PATTERN_METADATA_NAME)\
+  end, \"must start with a letter and contain only lowercase alphanumerical characters and dashes\")\
+  local projectVersion = validatedPrompt(\"Project version\", function(self)\
+    return match(self, PATTERN_METADATA_VERSION)\
+  end, \"must be formatted as 'NUMBER.NUMBER.NUMBER'\", \"1.0.0\")\
+  local projectRepository = validatedPrompt(\"Project repository\", function(self)\
+    return match(self, PATTERN_METADATA_REPOSITORY)\
+  end, \"must be formatted as 'PROTOCOL://PATH'\", \"unknown://unknown\")\
+  local entryPoints = tonumber(validatedPrompt(\"Amount of project entry points\", function(self)\
+    return tonumber(self) > 0\
+  end, \"must have at least one entry point\", \"1\"))\
+  local entryPoint, endPoint\
+  local projectBuilds = { }\
+  for index = 1, entryPoints do\
+    entryPoint = validatedPrompt(\"Entry point #\" .. tostring(index), function(self)\
+      return match(self, PATTERN_MODULE_NAMESPACE)\
+    end, \"namespace must contain only alphanumeric characters, dashes, slashes, and underscores\", tostring(projectAuthor) .. \"/\" .. tostring(projectName) .. \"/main\")\
+    endPoint = prompt(\"End point #\" .. tostring(index), tostring(projectAuthor) .. \".\" .. tostring(projectName) .. \".\" .. tostring(basename(entryPoint)))\
+    projectBuilds[entryPoint] = endPoint\
+  end\
+  local encoded = encode({\
+    name = projectName,\
+    author = projectAuthor,\
+    version = projectVersion,\
+    repository = projectRepository,\
+    projectBuilds = projectBuilds\
+  }, {\
+    propertiesEncoder = \"moonscript\"\
+  })\
+  return writeFileSync(join(PROJECT_PATH.home, \".gmodmanifest\"), encoded)\
+end)",
 ['novacbn/gmodproj/commands/new'] = "local pairs, type\
 do\
   local _obj_0 = _G\
@@ -1128,6 +1255,49 @@ end\
 executeCommand = function(flags)\
   return print(TEXT_COMMAND_VERSION)\
 end",
+['novacbn/gmodproj/commands/watch'] = "local unpack\
+unpack = _G.unpack\
+local pack\
+pack = dependency(\"novacbn/novautils/utilities\").pack\
+local logInfo\
+logInfo = dependency(\"novacbn/gmodproj/lib/logging\").logInfo\
+local ResolverOptions\
+ResolverOptions = dependency(\"novacbn/gmodproj/schemas/ResolverOptions\").ResolverOptions\
+local readManifest\
+readManifest = dependency(\"novacbn/gmodproj/lib/utilities\").readManifest\
+local watchPath\
+watchPath = dependency(\"novacbn/gmodproj/lib/utilities/fs\").watchPath\
+local bin = dependency(\"novacbn/gmodproj/commands/bin\")\
+local build = dependency(\"novacbn/gmodproj/commands/build\")\
+local makeBinding\
+makeBinding = function(flags, script, ...)\
+  if script then\
+    local args = pack(...)\
+    return function()\
+      return bin.executeCommand(flags, script, unpack(args))\
+    end\
+  end\
+  return function()\
+    return build.executeCommand(flags, \"development\")\
+  end\
+end\
+formatDescription = function(flags)\
+  return \"watch [script]\\t\\t\\t\\tWatches the source directory for changes and rebuilds in development\\n\\t\\t\\t\\t\\t\\t\\tExecutes a script instead, if specified\"\
+end\
+executeCommand = function(flags, script, ...)\
+  local options = readManifest()\
+  local modificationBind = makeBinding(flags, script, ...)\
+  watchPath(options:get(\"sourceDirectory\"), modificationBind)\
+  if flags[\"-ws\"] or flags[\"--watch-search\"] then\
+    local resolverOptions = ResolverOptions:new(options:get(\"Resolver\"))\
+    local _list_0 = resolverOptions:get(\"searchPaths\")\
+    for _index_0 = 1, #_list_0 do\
+      local path = _list_0[_index_0]\
+      watchPath(path, modificationBind)\
+    end\
+  end\
+  return logInfo(\"Watching project directories for modification...\")\
+end",
 ['novacbn/gmodproj/lib/ElapsedTimer'] = "local format\
 format = string.format\
 local gettime\
@@ -1150,13 +1320,15 @@ ElapsedTimer = Object:extend({\
     return format(\"%.4fs\", getSeconds() - self.startTime)\
   end\
 })",
-['novacbn/gmodproj/lib/ScriptingEnvironment'] = "local assert, error, ipairs, pcall, pairs, setfenv\
+['novacbn/gmodproj/lib/ScriptingEnvironment'] = "local assert, error, ipairs, loadfile, pcall, pairs, setfenv\
 do\
   local _obj_0 = _G\
-  assert, error, ipairs, pcall, pairs, setfenv = _obj_0.assert, _obj_0.error, _obj_0.ipairs, _obj_0.pcall, _obj_0.pairs, _obj_0.setfenv\
+  assert, error, ipairs, loadfile, pcall, pairs, setfenv = _obj_0.assert, _obj_0.error, _obj_0.ipairs, _obj_0.loadfile, _obj_0.pcall, _obj_0.pairs, _obj_0.setfenv\
 end\
 local match\
 match = string.match\
+local insert\
+insert = table.insert\
 local existsSync, mkdirSync, readFileSync, writeFileSync, unlinkSync\
 do\
   local _obj_0 = require(\"fs\")\
@@ -1172,18 +1344,21 @@ do\
   local _obj_0 = require(\"path\")\
   isAbsolute, join = _obj_0.isAbsolute, _obj_0.join\
 end\
+local moonscript = require(\"moonscript\")\
 local merge\
 merge = dependency(\"novacbn/novautils/table\").merge\
-local SYSTEM_OS_ARCH, SYSTEM_OS_TYPE, SYSTEM_UNIX_LIKE\
+local PROJECT_PATH, SYSTEM_OS_ARCH, SYSTEM_OS_TYPE, SYSTEM_UNIX_LIKE\
 do\
   local _obj_0 = dependency(\"novacbn/gmodproj/lib/constants\")\
-  SYSTEM_OS_ARCH, SYSTEM_OS_TYPE, SYSTEM_UNIX_LIKE = _obj_0.SYSTEM_OS_ARCH, _obj_0.SYSTEM_OS_TYPE, _obj_0.SYSTEM_UNIX_LIKE\
+  PROJECT_PATH, SYSTEM_OS_ARCH, SYSTEM_OS_TYPE, SYSTEM_UNIX_LIKE = _obj_0.PROJECT_PATH, _obj_0.SYSTEM_OS_ARCH, _obj_0.SYSTEM_OS_TYPE, _obj_0.SYSTEM_UNIX_LIKE\
 end\
 local fromString, toString\
 do\
   local _obj_0 = dependency(\"novacbn/gmodproj/lib/datafile\")\
   fromString, toString = _obj_0.fromString, _obj_0.toString\
 end\
+local logError\
+logError = dependency(\"novacbn/gmodproj/lib/logging\").logError\
 local exec, execFormat, isDir, isFile\
 do\
   local _obj_0 = dependency(\"novacbn/gmodproj/lib/utilities/fs\")\
@@ -1201,13 +1376,33 @@ ChunkEnvironment = function(environmentRoot, allowUnsafe)\
       return path\
     end\
   end\
+  local moduleCache = { }\
+  local orderedTests = { }\
+  local unitTests = { }\
   local environmentTable\
   environmentTable = {\
     ENV_ALLOW_UNSAFE_SCRIPTING = allowUnsafe,\
+    PROJECT_PATH = PROJECT_PATH,\
     SYSTEM_OS_ARCH = SYSTEM_OS_ARCH,\
     SYSTEM_OS_TYPE = SYSTEM_OS_TYPE,\
     SYSTEM_UNIX_LIKE = SYSTEM_UNIX_LIKE,\
     assert = assert,\
+    define = function(name, callback)\
+      if not (type(name) == \"string\") then\
+        error(\"bad argument #1 to 'define' (expected string)\")\
+      end\
+      if unitTests[name] then\
+        error(\"bad argument #1 to 'define' (test already defined)\")\
+      end\
+      if not (type(callback) == \"function\") then\
+        error(\"bad argument #2 to 'define' (expected function)\")\
+      end\
+      unitTests[name] = true\
+      return insert(orderedTests, {\
+        name = name,\
+        callback = callback\
+      })\
+    end,\
     error = error,\
     exists = function(path)\
       path = assertx.argument(getEnvironmentPath(path), 1, \"exists\", \"expected relative path, got '\" .. tostring(path) .. \"'\")\
@@ -1253,6 +1448,33 @@ ChunkEnvironment = function(environmentRoot, allowUnsafe)\
       end\
       return nil\
     end,\
+    test = function()\
+      local success, err\
+      for _index_0 = 1, #orderedTests do\
+        local unitTest = orderedTests[_index_0]\
+        success, err = pcall(unitTest.callback)\
+        unitTest.success = success\
+        if not (success) then\
+          logError(\"Failed unit test '\" .. tostring(unitTest.name) .. \"'\\n\" .. tostring(err))\
+          print(\"\")\
+        end\
+      end\
+      local failed = 0\
+      local successful = 0\
+      local total = #orderedTests\
+      for _index_0 = 1, #orderedTests do\
+        local unitTest = orderedTests[_index_0]\
+        if unitTest.success then\
+          successful = successful + 1\
+        else\
+          failed = failed + 1\
+        end\
+      end\
+      if failed > 0 then\
+        return 1, tostring(successful) .. \" successes, \" .. tostring(failed) .. \" failed, out of \" .. tostring(total) .. \" test(s)\"\
+      end\
+      return 0, \"All \" .. tostring(total) .. \" test(s) passed\"\
+    end,\
     tostring = tostring,\
     write = function(path, contents)\
       path = assertx.argument(getEnvironmentPath(path), 1, \"write\", \"expected relative path, got '\" .. tostring(path) .. \"'\")\
@@ -1271,11 +1493,35 @@ ChunkEnvironment = function(environmentRoot, allowUnsafe)\
   if allowUnsafe then\
     merge(environmentTable, {\
       dependency = dependency,\
-      require = require,\
+      require = function(name)\
+        local path = join(PROJECT_PATH.home, name)\
+        local loader = nil\
+        if isFile(path .. \".lua\") then\
+          path = path .. \".lua\"\
+          loader = loadfile\
+        elseif isFile(path .. \".moon\") then\
+          path = path .. \".moon\"\
+          loader = moonscript.loadfile\
+        end\
+        if loader then\
+          if not (moduleCache[name]) then\
+            local chunk = loader(path)\
+            setfenv(chunk, environmentTable)\
+            moduleCache[name] = chunk()\
+          end\
+          return moduleCache[name]\
+        end\
+        local success, exports = pcall(dependency, name)\
+        if success then\
+          return exports\
+        end\
+        return require(name)\
+      end,\
       exec = exec,\
       execFormat = execFormat\
     })\
   end\
+  environmentTable._G = environmentTable\
   return setmetatable({ }, {\
     __index = environmentTable\
   })\
@@ -1330,7 +1576,7 @@ end\
 APPLICATION_CORE_VERSION = {\
   0,\
   4,\
-  1\
+  3\
 }\
 ENV_ALLOW_UNSAFE_SCRIPTING = isAffirmative(getenv(\"GMODPROJ_ALLOW_UNSAFE_SCRIPTING\") or \"y\")\
 MAP_DEFAULT_PLUGINS = {\
@@ -1638,6 +1884,11 @@ logFatal = makeLogger(\"FATAL\", \"\\27[35m\", {\
 })",
 ['novacbn/gmodproj/lib/utilities'] = "local pcall\
 pcall = _G.pcall\
+local resume, running, yield\
+do\
+  local _obj_0 = coroutine\
+  resume, running, yield = _obj_0.resume, _obj_0.running, _obj_0.yield\
+end\
 local readFileSync, mkdirSync\
 do\
   local _obj_0 = require(\"fs\")\
@@ -1673,6 +1924,15 @@ configureEnvironment = function()\
     mkdirSync(PROJECT_PATH.logs)\
   end\
   return enableFileLogging()\
+end\
+makeSync = function(func)\
+  return function(...)\
+    local thread = running()\
+    func(..., function(...)\
+      return resume(thread, ...)\
+    end)\
+    return yield()\
+  end\
 end\
 readManifest = function()\
   if isDir(PROJECT_PATH.manifest) then\
@@ -1711,8 +1971,11 @@ deprecate = function(featureKey, text)\
     DEPRECATION_FEATURE_KEYS[featureKey] = true\
   end\
 end",
-['novacbn/gmodproj/lib/utilities/fs'] = "local ipairs\
-ipairs = _G.ipairs\
+['novacbn/gmodproj/lib/utilities/fs'] = "local ipairs, type\
+do\
+  local _obj_0 = _G\
+  ipairs, type = _obj_0.ipairs, _obj_0.type\
+end\
 local popen\
 popen = io.popen\
 local match\
@@ -1722,8 +1985,95 @@ do\
   local _obj_0 = table\
   concat, insert = _obj_0.concat, _obj_0.insert\
 end\
-local statSync\
-statSync = require(\"fs\").statSync\
+local readdirSync, statSync\
+do\
+  local _obj_0 = require(\"fs\")\
+  readdirSync, statSync = _obj_0.readdirSync, _obj_0.statSync\
+end\
+local join\
+join = require(\"path\").join\
+local nextTick\
+nextTick = process.nextTick\
+local PATHS_TO_WATCH = { }\
+local scanTimestamps\
+scanTimestamps = function(directory)\
+  local lastModified = -1\
+  local files = collectFiles(directory)\
+  local modificationTime\
+  for _index_0 = 1, #files do\
+    local file = files[_index_0]\
+    modificationTime = statSync(join(directory, file)).mtime.sec\
+    if lastModified < modificationTime then\
+      lastModified = modificationTime\
+    end\
+  end\
+  return lastModified\
+end\
+local watchLoop\
+watchLoop = function()\
+  do\
+    local _accum_0 = { }\
+    local _len_0 = 1\
+    for _index_0 = 1, #PATHS_TO_WATCH do\
+      local entry = PATHS_TO_WATCH[_index_0]\
+      if isDir(entry.path) or isFile(entry.path) then\
+        _accum_0[_len_0] = entry\
+        _len_0 = _len_0 + 1\
+      end\
+    end\
+    PATHS_TO_WATCH = _accum_0\
+  end\
+  local lastModified\
+  for _index_0 = 1, #PATHS_TO_WATCH do\
+    local entry = PATHS_TO_WATCH[_index_0]\
+    if isDir(entry.path) then\
+      lastModified = scanTimestamps(entry.path)\
+    else\
+      lastModified = statSync(entry.path).mtime.sec\
+    end\
+    if entry.lastModified == -1 then\
+      entry.lastModified = lastModified\
+    elseif entry.lastModified ~= lastModified then\
+      entry.callback(entry.path)\
+      entry.lastModified = lastModified\
+    end\
+  end\
+  if #PATHS_TO_WATCH > 0 then\
+    return nextTick(watchLoop)\
+  end\
+end\
+collectFiles = function(path, paths, base)\
+  if paths == nil then\
+    paths = { }\
+  end\
+  if base == nil then\
+    base = \"\"\
+  end\
+  if not (type(path) == \"string\") then\
+    error(\"bad argument #1 to 'collectFiles' (expected string)\")\
+  end\
+  if not (isDir(path) or isFile(path)) then\
+    error(\"bad argument #1 to 'collectFiles' (invalid path)\")\
+  end\
+  if not (type(paths) == \"table\") then\
+    error(\"bad argument #2 to 'collectFiles' (expected table)\")\
+  end\
+  if not (type(base) == \"string\") then\
+    error(\"bad argument #3 to 'collectFiles' (expected string)\")\
+  end\
+  local joined\
+  local _list_0 = readdirSync(path)\
+  for _index_0 = 1, #_list_0 do\
+    local name = _list_0[_index_0]\
+    joined = join(path, name)\
+    if isFile(joined) then\
+      insert(paths, join(base, name))\
+    else\
+      collectFiles(joined, paths, join(base, name))\
+    end\
+  end\
+  return paths\
+end\
 formatCommand = function(...)\
   local commandArguments = {\
     ...\
@@ -1751,6 +2101,25 @@ end\
 isFile = function(path)\
   local fileStats = statSync(path)\
   return fileStats and fileStats.type == \"file\" or false\
+end\
+watchPath = function(path, callback)\
+  if not (type(path) == \"string\") then\
+    error(\"bad argument #1 to 'watchPath' (expected string)\")\
+  end\
+  if not (isDir(path) or isFile(path)) then\
+    error(\"bad argument #1 to 'watchPath' (invalid path)\")\
+  end\
+  if not (type(callback) == \"function\") then\
+    error(\"bad argument #2 to 'watchPath' (expected function)\")\
+  end\
+  insert(PATHS_TO_WATCH, {\
+    callback = callback,\
+    path = path,\
+    lastModified = -1\
+  })\
+  if #PATHS_TO_WATCH == 1 then\
+    return nextTick(watchLoop)\
+  end\
 end",
 ['novacbn/gmodproj/lib/utilities/openssl'] = "local base64, digest\
 do\
@@ -1855,24 +2224,47 @@ end\
 local APPLICATION_SUB_COMMANDS = {\
   bin = dependency(\"novacbn/gmodproj/commands/bin\"),\
   build = dependency(\"novacbn/gmodproj/commands/build\"),\
+  clean = dependency(\"novacbn/gmodproj/commands/clean\"),\
+  init = dependency(\"novacbn/gmodproj/commands/init\"),\
   new = dependency(\"novacbn/gmodproj/commands/new\"),\
-  version = dependency(\"novacbn/gmodproj/commands/version\")\
+  version = dependency(\"novacbn/gmodproj/commands/version\"),\
+  watch = dependency(\"novacbn/gmodproj/commands/watch\")\
 }\
 local APPLICATION_COMMAND_FLAGS = {\
   {\
-    \"-q\",\
-    \"--quiet\",\
-    \"Disables logging to console\"\
+    \"-ca\",\
+    \"--clean-all\",\
+    \"\\t\\t\\tEnables cleaning of all generated project files\"\
+  },\
+  {\
+    \"-cl\",\
+    \"--clean-logs\",\
+    \"\\t\\t\\tEnables cleaning of project log files\"\
   },\
   {\
     \"-nc\",\
     \"--no-cache\",\
-    \"Disables caching of built project files\"\
+    \"\\t\\t\\t\\tDisables caching and cleaning of built project files\"\
   },\
   {\
     \"-nf\",\
     \"--no-file\",\
-    \"Disables logging to files\"\
+    \"\\t\\t\\t\\tDisables logging to files\"\
+  },\
+  {\
+    \"-nl\",\
+    \"--no-logs\",\
+    \"\\t\\t\\t\\tDisables cleaning of project log files\"\
+  },\
+  {\
+    \"-q\",\
+    \"--quiet\",\
+    \"\\t\\t\\t\\tDisables output to console\"\
+  },\
+  {\
+    \"-ws\",\
+    \"--watch-search\",\
+    \"\\t\\t\\tEnables watching package search paths specified in project manifest\"\
   }\
 }\
 local PATTERN_FLAG_MINI = \"%-[%w%-]+\"\
@@ -1911,7 +2303,7 @@ displayHelpText = function(flags)\
     local _len_0 = 1\
     for _index_0 = 1, #APPLICATION_COMMAND_FLAGS do\
       local flag = APPLICATION_COMMAND_FLAGS[_index_0]\
-      _accum_0[_len_0] = \"\\t\" .. tostring(flag[1]) .. \", \" .. tostring(flag[2]) .. \"\\t\\t\\t\\t\" .. tostring(flag[3])\
+      _accum_0[_len_0] = \"\\t\" .. tostring(flag[1]) .. \", \" .. tostring(flag[2]) .. tostring(flag[3])\
       _len_0 = _len_0 + 1\
     end\
     flagsText = _accum_0\

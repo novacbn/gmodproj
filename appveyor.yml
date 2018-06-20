@@ -19,6 +19,7 @@ before_build:
 
 build_script:
   - bin\gmodproj bin build development
+  - bin\gmodproj bin test
 
 after_test:
   - bin\gmodproj bin build production
