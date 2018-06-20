@@ -1,6 +1,6 @@
 import tmpname from require "os"
 import readFileSync, mkdirSync, unlinkSync from require "fs"
-import join from require "path"
+import join, normalizeSeparators from require "path"
 
 import collectFiles from require "novacbn/gmodproj/lib/utilities/fs"
 import hashSHA1 from require "novacbn/gmodproj/lib/utilities/openssl"
@@ -11,7 +11,7 @@ import hashSHA1 from require "novacbn/gmodproj/lib/utilities/openssl"
 local generateManifest, readData
 compareManifests = (directory, target) ->
     sourceManifest  = generateManifest(directory)
-    targetManifest  = readData(target)
+    targetManifest  = {normalizeSeparators(name), checksum for name, checksum in pairs(readData(target))}
 
     for name, checksum in pairs(targetManifest)
         error("file '#{name}' is missing from output") unless sourceManifest[name]
