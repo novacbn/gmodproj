@@ -1,9 +1,8 @@
 import tmpname from require "os"
 import readFileSync, mkdirSync, unlinkSync from require "fs"
-import join, normalizeSeparators from require "path"
-
-import collectFiles from require "novacbn/gmodproj/lib/utilities/fs"
-import hashSHA1 from require "novacbn/gmodproj/lib/utilities/openssl"
+import join, normalizeSeparators, relative from require "path"
+import createHash from require "novacbn/luvit-extras/crypto"
+import isdirSync, walkSync from require "novacbn/luvit-extras/fs"
 
 -- ::compareManifests(string directory, string target) -> void
 -- Compares the stored manifest data with the newly generated manifest
@@ -21,7 +20,14 @@ compareManifests = (directory, target) ->
 -- Generates a manifest of SHA-1 checksums for each file in the directory recursively
 -- export
 generateManifest = (directory) ->
-    return {name, hashSHA1(readFileSync(join(directory, name))) for name in *collectFiles(directory)}
+    manifest = {}
+
+    for name in *walkSync(directory)
+        continue if isdirSync(name)
+
+        manifest[relative(directory, name)] = createHash(readFileSync(name), "SHA1")
+
+    return manifest
 
 -- ::readData(string name) -> table
 -- Loads a JSON data file from the test directory of the project

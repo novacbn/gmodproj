@@ -14,6 +14,7 @@ import makeStringEscape from "novacbn/gmodproj/lib/utilities/string"
 
 -- ::escapeString(string unescapedString) -> string
 -- Escapes a string to be Lua-safe
+--
 escapeString = makeStringEscape {
     {"\\", "\\\\"},
     {"'", "\\'"},
@@ -24,6 +25,7 @@ escapeString = makeStringEscape {
 
 -- ::encodeKeyString(string stringKey) -> string, boolean
 -- Encodes a string-key for DataFile serialization
+--
 encodeKeyString = (stringKey) ->
     -- Escape the string before encoding
     stringKey = escapeString(stringKey)
@@ -34,6 +36,7 @@ encodeKeyString = (stringKey) ->
 
 -- ::encodeValueString(string stringValue) -> string
 -- Encodes a string-value for DataFile serialization
+--
 encodeValueString = (stringValue) ->
     -- Escape the string before encoding, then encode as Lua string
     stringValue = escapeString(stringValue)
@@ -41,6 +44,7 @@ encodeValueString = (stringValue) ->
 
 -- ::encodeValueTable(table tableValue, number stackLevel?) -> string
 -- Encodes a table-value for DataFile serialization
+--
 local encodeKey, encodeValue
 encodeValueTable = (tableValue, stackLevel=0) ->
     -- Make the new string stack and calculate the tabs per member
@@ -80,6 +84,7 @@ encodeValueTable = (tableValue, stackLevel=0) ->
 
 -- ::typeEncodeMap -> table
 -- Represents a map of key and value type encoders
+--
 typeEncodeMap = {
     key: {
         boolean:    => @, true,
@@ -97,6 +102,7 @@ typeEncodeMap = {
 
 -- ::encodeKey(any key, any ...) -> string
 -- Encodes a key to the DataFile format
+--
 encodeKey = (key, ...) ->
     -- Validate that the key can be encoded, then encode it
     keyEncoder = typeEncodeMap.key[type(key)]
@@ -105,6 +111,7 @@ encodeKey = (key, ...) ->
 
 -- ::encodeValue(any value, any ...) -> string
 -- Encodes a value to the DataFile format
+--
 encodeValue = (value, ...) ->
     -- Validate the the value can be encoded, then encode it
     valueEncoder = typeEncodeMap.value[type(value)]
@@ -131,6 +138,7 @@ KeyPair = (name, levelToggle) -> setmetatable({:name}, {
 
 -- ::ChunkEnvironment(table dataExports) -> ChunkEnvironment, table
 -- A primitive type representing a DataFile Lua environment
+--
 ChunkEnvironment = (dataExports={}) ->
     -- Create a flag for if the next member if top-level
     topLevel    = true
@@ -148,7 +156,7 @@ ChunkEnvironment = (dataExports={}) ->
     }), dataExports
 
 -- ::loadChunk(function sourceChunk) -> table
--- Parses a function chunk as a DataFile
+-- (DEPRECATED) Parses a function chunk as a DataFile
 -- export
 export loadChunk = (sourceChunk) ->
     deprecate("novacbn/gmodproj/lib/datafile::loadChunk", "novacbn/gmodproj/lib/datafile::loadChunk is deprecated, see 0.4.0 changelog")
@@ -159,7 +167,7 @@ export loadChunk = (sourceChunk) ->
     return dataExports
 
 -- ::readString(string sourceString, string chunkName?) -> table
--- Deserializes a table in the DataFile format
+-- (DEPRECATED) Deserializes a table in the DataFile format
 -- TODO:
 --  add flag to perform lexical parsing instead of loading code for safer deserialization
 -- export
@@ -171,7 +179,7 @@ export fromString = (sourceString, chunkName="DataFile Chunk") ->
     return loadChunk(sourceChunk)
 
 -- ::toString(table sourceTable) -> string
--- Serializes a table into the DataFile format
+-- (DEPRECATED) Serializes a table into the DataFile format
 -- TODO:
 --  support alphabetic and values before tables sortings
 -- export

@@ -3,13 +3,16 @@ import byte, gmatch, gsub, lower from string
 import concat from table
 
 import makeLookupMap from "novacbn/novautils/table"
+import deprecate from "novacbn/gmodproj/lib/utilities/deprecate"
 
 -- ::PATTERN_TEMPLATE_TOKEN -> string
 -- Represents an extraction pattern for tokens in templates
+--
 PATTERN_TEMPLATE_TOKEN = "(%${)(%w+)(})"
 
 -- ::MAP_AFFIRMATIVE_VALUES -> table
 -- Represents a map of possible affirmative user values
+--
 MAP_AFFIRMATIVE_VALUES = makeLookupMap {
     "y",
     "yes",
@@ -20,12 +23,16 @@ MAP_AFFIRMATIVE_VALUES = makeLookupMap {
 
 -- ::isAffirmative(string userValue) -> boolean
 -- Returns if the user value is an affirmative response
+-- export
 export isAffirmative = (userValue) ->
     return MAP_AFFIRMATIVE_VALUES[lower(userValue)] or false
 
 -- ::makeTemplate(string stringTemplate) -> function
--- Makes a simple string substitution template function
+-- (DEPRECATED) Makes a simple string substitution template function
+-- export
 export makeTemplate = (stringTemplate) ->
+    deprecate("novacbn/gmodproj/lib/utilities/string::makeTemplate", "novacbn/gmodproj/lib/utilities/string::makeTemplate is deprecated, see 0.4.3 changelog")
+
     return (templateTokens) ->
         -- Substitute tokens in the template
         return gsub(stringTemplate, PATTERN_TEMPLATE_TOKEN, (startBoundry, tokenName, endBoundry) ->
@@ -37,6 +44,7 @@ export makeTemplate = (stringTemplate) ->
 
 -- ::makeStringEscape(table lookup) -> function
 -- Makes a string naive replacement function via a token, replacement array
+-- export
 export makeStringEscape = (lookup) ->
     -- Make a helper escape function
     return (value) ->
@@ -46,11 +54,13 @@ export makeStringEscape = (lookup) ->
 
 -- ::toBytes(string sourceString) -> table
 -- Converts a string into a table of bytes
+-- export
 export toBytes = (sourceString) ->
     return [byte(subString) for subString in gmatch(sourceString, ".")]
 
 -- ::toByteString(string sourceString) -> table
 -- Converts a string into a table of bytes that can be parsed by Lua
+-- export
 export toByteString = (sourceString) ->
     byteTable = toBytes(sourceString)
     return "{"..concat(byteTable, ",").."}"

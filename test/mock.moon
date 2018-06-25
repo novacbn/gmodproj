@@ -1,4 +1,4 @@
-import chdir from require "uv"
+import chdir from require "novacbn/luvit-extras/process"
 
 import BINARY_DIST, TMP_DIR from require "test/lib/constants"
 import generateManifest, writeData from require "test/lib/utilities"

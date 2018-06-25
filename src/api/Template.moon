@@ -1,11 +1,9 @@
 import dirname, join from require "path"
 import existsSync, mkdirSync, writeFileSync from require "fs"
-
+import isdirSync from "novacbn/luvit-extras/fs"
 import Object from "novacbn/novautils/utilities/Object"
 json        = dependency "rxi/json/main"
 properties  = dependency "novacbn/properties/exports"
-
-import isDir from "novacbn/gmodproj/lib/utilities/fs"
 
 -- Template::Template()
 -- Represents a template for quickly creating new project directory structures
@@ -38,7 +36,7 @@ export Template = Object\extend {
         -- Validate the path can be created then make it
         directoryPath = join(@projectPath, directoryPath)
         error("bad argument #1 to 'createDirectory' (path already exists)") if existsSync(directoryPath)
-        error("bad argument #1 to 'createDirectory' (parent directory does not exist)") unless isDir(dirname(directoryPath))
+        error("bad argument #1 to 'createDirectory' (parent directory does not exist)") unless isdirSync(dirname(directoryPath))
         mkdirSync(directoryPath)
 
     -- Template::write(string filePath, string fileContents) -> void
@@ -46,7 +44,7 @@ export Template = Object\extend {
     --
     write: (filePath, fileContents) =>
         filePath = join(@projectPath, filePath)
-        error("bad argument #1 to 'write' (parent directory does not exist)") unless isDir(dirname(filePath))
+        error("bad argument #1 to 'write' (parent directory does not exist)") unless isdirSync(dirname(filePath))
         writeFileSync(filePath, fileContents)
 
     -- Template::writeProperties(string filePath, table sourceTable) -> void

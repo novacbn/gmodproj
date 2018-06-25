@@ -2,12 +2,11 @@ import loadstring, pairs, pcall from _G
 
 import readFileSync from require "fs"
 import join from require "path"
-
+import isfileSync from "novacbn/luvit-extras/fs"
 import Default, Object from "novacbn/novautils/utilities/Object"
 
 import APPLICATION_CORE_VERSION, PROJECT_PATH, USER_PATH from "novacbn/gmodproj/lib/constants"
 import logFatal from "novacbn/gmodproj/lib/logging"
-import isFile from "novacbn/gmodproj/lib/utilities/fs"
 
 -- ::loadPlugin(string pluginName) -> table or nil, string or nil
 -- Loads the plugin and returns its exports table
@@ -15,7 +14,7 @@ import isFile from "novacbn/gmodproj/lib/utilities/fs"
 loadPlugin = (pluginName) ->
     -- Try to load the plugin from the project installed plugins
     pluginPath = join(PROJECT_PATH.plugins, pluginName)..".lua"
-    if isFile(pluginPath)
+    if isfileSync(pluginPath)
         contents            = readFileSync(pluginPath)
         pluginChunk, err    = loadstring(contents, "project-plugin:"..pluginName)
 
@@ -25,7 +24,7 @@ loadPlugin = (pluginName) ->
 
     -- Try to load the plugin from the globally installed plugins
     pluginPath = join(USER_PATH.plugins, pluginName)..".lua"
-    if isFile(pluginPath)
+    if isfileSync(pluginPath)
         contents            = readFileSync(pluginPath)
         pluginChunk, err    = loadstring(contents, "user-plugin:"..pluginName)
 

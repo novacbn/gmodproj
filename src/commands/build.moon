@@ -1,6 +1,7 @@
 import lower from string
 
 import join from require "path"
+import isdirSync from "novacbn/luvit-extras/fs"
 
 import Packager from "novacbn/gmodproj/Packager"
 import PluginManager from "novacbn/gmodproj/PluginManager"
@@ -9,7 +10,6 @@ import PROJECT_PATH from "novacbn/gmodproj/lib/constants"
 import ElapsedTimer from "novacbn/gmodproj/lib/ElapsedTimer"
 import logFatal, logInfo from "novacbn/gmodproj/lib/logging"
 import configureEnvironment, readManifest from "novacbn/gmodproj/lib/utilities"
-import isDir from "novacbn/gmodproj/lib/utilities/fs"
 
 -- ::formatDescription(table flags) -> string
 -- Formats the help description of the command
@@ -39,7 +39,7 @@ export executeCommand = (flags, mode="development") ->
 
     -- Build a distributable package for each specified project build
     buildDirectory = join(PROJECT_PATH.home, options\get("buildDirectory"))
-    logFatal("Build directory does not exist!") unless isDir(buildDirectory)
+    logFatal("Build directory does not exist!") unless isdirSync(buildDirectory)
 
     for entryPoint, targetPackage in pairs(options\get("projectBuilds"))
         logInfo("Building entry point '#{entryPoint}'")

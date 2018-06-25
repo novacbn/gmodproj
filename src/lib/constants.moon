@@ -2,15 +2,9 @@ import getenv from os
 import arch, os from jit
 
 import join from require "path"
+import os_homedir from require "uv"
 
 import isAffirmative from "novacbn/gmodproj/lib/utilities/string"
-
--- ::userHome -> string
--- Represents the home folder for application data of the user
---
-userHome = switch os
-    when "Windows" then getenv("APPDATA")
-    when "Linux" then getenv("HOME")
 
 -- ::APPLICATION_CORE_VERSION -> table
 -- Represents the current version of the application
@@ -92,10 +86,10 @@ export PROJECT_PATH = with {}
 -- Represents a map of paths for stored user data
 -- export
 export USER_PATH = with {}
-    -- USER_PATH::data -> string
+    -- USER_PATH::home -> string
     -- Represents the home directory of gmodproj's user data
     --
-    .data = join(userHome, ".gmodproj")
+    .home = join(os == "Windows" and getenv("APPDATA") or os_homedir(), ".gmodproj")
 
     -- USER_PATH::applications -> string
     -- Represents the globally installed command line applications

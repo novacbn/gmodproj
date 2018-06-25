@@ -4,13 +4,12 @@ import insert from table
 
 import readdirSync from require "fs"
 import basename, dirname, extname, join from require "path"
-
+import isfileSync from "novacbn/luvit-extras/fs"
 import Set from "novacbn/novautils/collections/Set"
 import Default, Object from "novacbn/novautils/utilities/Object"
 
 import ResolverOptions from "novacbn/gmodproj/schemas/ResolverOptions"
 import PROJECT_PATH from "novacbn/gmodproj/lib/constants"
-import isFile from "novacbn/gmodproj/lib/utilities/fs"
 import makeStringEscape from "novacbn/gmodproj/lib/utilities/string"
 
 -- :: escapePattern(string value) -> string
@@ -28,7 +27,7 @@ collectFiles = (baseDirectory, files={}, subDirectory) ->
     currentDirectory = subDirectory and join(baseDirectory, subDirectory) or baseDirectory
     for fileName in *readdirSync(currentDirectory)
         -- If the file name is a file, insert it, otherwise recursively walk the directory tree
-        if isFile(join(currentDirectory, fileName)) then insert(files, subDirectory and subDirectory.."/"..fileName or fileName)
+        if isfileSync(join(currentDirectory, fileName)) then insert(files, subDirectory and subDirectory.."/"..fileName or fileName)
         else collectFiles(baseDirectory, files, subDirectory and subDirectory.."/"..fileName or fileName)
 
     return files
@@ -75,7 +74,7 @@ export Resolver = Object\extend {
             local assetPath
             for assetExtension, assetType in pairs(@registeredAssets)
                 assetPath = join(@sourceDirectory, "#{projectAsset}.#{assetExtension}")
-                return assetType, assetPath if isFile(assetPath)
+                return assetType, assetPath if isfileSync(assetPath)
 
         -- If asset was not found already, scan the configured search paths
         local assetFile, assetPath
@@ -86,7 +85,7 @@ export Resolver = Object\extend {
 
             for searchPath in *searchPaths
                 assetPath = join(searchPath, assetFile)
-                return assetType, assetPath if isFile(assetPath)
+                return assetType, assetPath if isfileSync(assetPath)
 
         -- Return nothing since no asset was found
         return nil, nil

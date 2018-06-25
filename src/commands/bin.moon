@@ -3,13 +3,14 @@ import loadfile, print, type from _G
 import process from _G
 import readFileSync from require "fs"
 import join from require "path"
+import isfileSync from "novacbn/luvit-extras/fs"
 moonscript = require "moonscript/base"
 
 import ENV_ALLOW_UNSAFE_SCRIPTING, PROJECT_PATH, SYSTEM_OS_TYPE, SYSTEM_UNIX_LIKE from "novacbn/gmodproj/lib/constants"
 import logError, logFatal, logInfo from "novacbn/gmodproj/lib/logging"
 import ScriptingEnvironment from "novacbn/gmodproj/lib/ScriptingEnvironment"
 import configureEnvironment, readManifest from "novacbn/gmodproj/lib/utilities"
-import execFormat, isFile from "novacbn/gmodproj/lib/utilities/fs"
+import execFormat from "novacbn/gmodproj/lib/utilities/fs"
 
 -- ::TEMPLATE_EXECUTION_SUCCESS(string script) -> string
 -- Formats a successful script execution
@@ -43,17 +44,17 @@ TEMPLATE_EXECUTION_SYNTAX = (script) -> "Script '#{script}' had a syntax error"
 resolveScript = (script) ->
     scriptPath = join(PROJECT_PATH.bin, script)
 
-    if isFile(scriptPath..".moon")
+    if isfileSync(scriptPath..".moon")
         return () -> moonscript.loadfile(scriptPath..".moon")
             
 
-    elseif isFile(scriptPath..".lua")
+    elseif isfileSync(scriptPath..".lua")
         return () -> loadfile(scriptPath..".lua")
 
-    elseif SYSTEM_UNIX_LIKE and isFile(scriptPath..".sh")
+    elseif SYSTEM_UNIX_LIKE and isfileSync(scriptPath..".sh")
         return nil, (...) -> execFormat("/usr/bin/env", "sh", scriptPath..".sh", ...)
 
-    elseif SYSTEM_OS_TYPE == "Windows" and isFile(scriptPath..".bat")
+    elseif SYSTEM_OS_TYPE == "Windows" and isfileSync(scriptPath..".bat")
         return nil, (...) -> execFormat("cmd.exe", scriptPath..".bat", ...)
 
 

@@ -10,18 +10,19 @@ import
     unlinkSync from require "fs"
 import decode, encode from require "json"
 import isAbsolute, join from require "path"
-moonscript = require "moonscript"
-
+import isdirSync, isfileSync from "novacbn/luvit-extras/fs"
 import merge from "novacbn/novautils/table"
+moonscript = require "moonscript"
 
 import PROJECT_PATH, SYSTEM_OS_ARCH, SYSTEM_OS_TYPE, SYSTEM_UNIX_LIKE from "novacbn/gmodproj/lib/constants"
 import fromString, toString from "novacbn/gmodproj/lib/datafile"
 import logError from "novacbn/gmodproj/lib/logging"
-import exec, execFormat, isDir, isFile from "novacbn/gmodproj/lib/utilities/fs"
+import exec, execFormat from "novacbn/gmodproj/lib/utilities/fs"
 assertx = dependency "novacbn/gmodproj/lib/utilities/assert"
 
 -- ChunkEnvironment::ChunkEnvironment(string environmentRoot, boolean allowUnsafe)
 -- Represents a primitive pseudo-sandboxed scripting environment
+--
 ChunkEnvironment = (environmentRoot, allowUnsafe) ->
     -- ::getEnvironmentPath(string path) -> string or nil
     -- Normalizes a path to be relative to the scripting environment's working directory only, errors otherwise if unsafe scripting is disabled
@@ -114,7 +115,7 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
         isDir: (path) ->
             -- Validate the path and then return if is a directory
             path = assertx.argument(getEnvironmentPath(path), 1, "isDir", "expected relative path, got '#{path}'")
-            return isDir(path)
+            return isdirSync(path)
 
         -- ChunkEnvironment::isFile(string path) -> boolean
         -- Returns if the path exists and is a file
@@ -122,7 +123,7 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
         isFile: (path) ->
             -- Validate the path and then return if is a file
             path = assertx.argument(getEnvironmentPath(path), 1, "isFile", "expected relative path, got '#{path}'")
-            return isFile(path)
+            return isfileSync(path)
 
         -- ChunkEnvironment::ipairs(table iteratee) -> function
         -- Lua's built-in ipairs function
@@ -162,7 +163,7 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
         read: (path) ->
             -- Validate the path and then read the file into memory
             path = assertx.argument(getEnvironmentPath(path), 1, "read", "expected relative path, got '#{path}'")
-            assertx.argument(isFile(path), 1, "read", "file '#{path}' does not exist")
+            assertx.argument(isfileSync(path), 1, "read", "file '#{path}' does not exist")
 
             return readFileSync(path)
 
@@ -183,7 +184,7 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
             -- Validate the path and then remove it
             path = assertx.argument(getEnvironmentPath(path), 1, "remove", "expected relative path, got '#{path}'")
 
-            if isDir(path) then rmdir(path)
+            if isdirSync(path) then rmdir(path)
             else unlinkSync(path)
             return nil
 
@@ -246,19 +247,19 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
         dependency: dependency
 
         -- ChunkEnvironment::require(string name) -> any
-        -- Imports a script from the running 'Luvit' environment
+        -- Imports a script from the running 'luvit' environment
         -- scripting, unsafe
         require: (name) ->
             -- Try to find the script within the project directory
             path    = join(PROJECT_PATH.home, name)
             loader  = nil
 
-            if isFile(path..".lua")
+            if isfileSync(path..".lua")
                 -- If there is a Lua file, provide the Lua loader
                 path    ..= ".lua"
                 loader  = loadfile
 
-            elseif isFile(path..".moon")
+            elseif isfileSync(path..".moon")
                 -- If there is a MoonScript file, provide the MoonScript loader
                 path    ..= ".moon"
                 loader  = moonscript.loadfile

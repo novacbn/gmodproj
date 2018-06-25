@@ -1,6 +1,7 @@
 # gmodproj changelog
 
 ## 0.4.3
+* Added [novacbn/luvit-extras](https://github.com/novacbn/luvit-extras) for extended `luvit` API features
 * Added testing for these CLI commands
     * `gmodproj build`
     * `gmodproj new`
@@ -10,7 +11,12 @@
     * `_G::require(string name) -> any` - Now searches for scripts in the following order: project directory, gmodproj modules, Luvit modules
         * Supports `.moon` files in the project directory
 * Updated bootstrap `gmodproj` to 0.4.3-indev
+* Updated `novacbn/gmodproj/lib/constants::USER_PATH::home` to use `libuv` on non-Windows operating systems
 * Updated CI to use test suite
+* Deprecated the following APIs, to be removed in `5.0.0`
+    * `novacbn/gmodproj/lib/utilities/fs`
+        * `::collectFiles`, `::isDir`, `::isFile`, and `::watchPath` - Deprecated for `novacbn/gmodproj/luvit-extras/fs`
+    * `novacbn/gmodproj/lib/utilities/openssl` - Fully deprecated for `novacbn/gmodproj/luvit-extras/crypto`
 
 ## 0.4.2
 * Added `gmodproj clean` command, empties the `.gmodproj/cache` build cache directory of your project

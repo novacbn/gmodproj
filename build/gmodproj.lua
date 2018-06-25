@@ -315,6 +315,8 @@ local readFileSync\
 readFileSync = require(\"fs\").readFileSync\
 local join\
 join = require(\"path\").join\
+local isfileSync\
+isfileSync = dependency(\"novacbn/luvit-extras/fs\").isfileSync\
 local Default, Object\
 do\
   local _obj_0 = dependency(\"novacbn/novautils/utilities/Object\")\
@@ -327,12 +329,10 @@ do\
 end\
 local logFatal\
 logFatal = dependency(\"novacbn/gmodproj/lib/logging\").logFatal\
-local isFile\
-isFile = dependency(\"novacbn/gmodproj/lib/utilities/fs\").isFile\
 local loadPlugin\
 loadPlugin = function(pluginName)\
   local pluginPath = join(PROJECT_PATH.plugins, pluginName) .. \".lua\"\
-  if isFile(pluginPath) then\
+  if isfileSync(pluginPath) then\
     local contents = readFileSync(pluginPath)\
     local pluginChunk, err = loadstring(contents, \"project-plugin:\" .. pluginName)\
     if pluginChunk then\
@@ -341,7 +341,7 @@ loadPlugin = function(pluginName)\
     return nil, err\
   end\
   pluginPath = join(USER_PATH.plugins, pluginName) .. \".lua\"\
-  if isFile(pluginPath) then\
+  if isfileSync(pluginPath) then\
     local contents = readFileSync(pluginPath)\
     local pluginChunk, err = loadstring(contents, \"user-plugin:\" .. pluginName)\
     if pluginChunk then\
@@ -399,6 +399,8 @@ do\
   local _obj_0 = require(\"path\")\
   basename, dirname, extname, join = _obj_0.basename, _obj_0.dirname, _obj_0.extname, _obj_0.join\
 end\
+local isfileSync\
+isfileSync = dependency(\"novacbn/luvit-extras/fs\").isfileSync\
 local Set\
 Set = dependency(\"novacbn/novautils/collections/Set\").Set\
 local Default, Object\
@@ -410,8 +412,6 @@ local ResolverOptions\
 ResolverOptions = dependency(\"novacbn/gmodproj/schemas/ResolverOptions\").ResolverOptions\
 local PROJECT_PATH\
 PROJECT_PATH = dependency(\"novacbn/gmodproj/lib/constants\").PROJECT_PATH\
-local isFile\
-isFile = dependency(\"novacbn/gmodproj/lib/utilities/fs\").isFile\
 local makeStringEscape\
 makeStringEscape = dependency(\"novacbn/gmodproj/lib/utilities/string\").makeStringEscape\
 local escapePattern = makeStringEscape({\
@@ -429,7 +429,7 @@ collectFiles = function(baseDirectory, files, subDirectory)\
   local _list_0 = readdirSync(currentDirectory)\
   for _index_0 = 1, #_list_0 do\
     local fileName = _list_0[_index_0]\
-    if isFile(join(currentDirectory, fileName)) then\
+    if isfileSync(join(currentDirectory, fileName)) then\
       insert(files, subDirectory and subDirectory .. \"/\" .. fileName or fileName)\
     else\
       collectFiles(baseDirectory, files, subDirectory and subDirectory .. \"/\" .. fileName or fileName)\
@@ -453,7 +453,7 @@ Resolver = Object:extend({\
       local assetPath\
       for assetExtension, assetType in pairs(self.registeredAssets) do\
         assetPath = join(self.sourceDirectory, tostring(projectAsset) .. \".\" .. tostring(assetExtension))\
-        if isFile(assetPath) then\
+        if isfileSync(assetPath) then\
           return assetType, assetPath\
         end\
       end\
@@ -465,7 +465,7 @@ Resolver = Object:extend({\
       for _index_0 = 1, #searchPaths do\
         local searchPath = searchPaths[_index_0]\
         assetPath = join(searchPath, assetFile)\
-        if isFile(assetPath) then\
+        if isfileSync(assetPath) then\
           return assetType, assetPath\
         end\
       end\
@@ -514,13 +514,15 @@ do\
 end\
 local join\
 join = require(\"path\").join\
+local isfileSync\
+isfileSync = dependency(\"novacbn/luvit-extras/fs\").isfileSync\
+local Object\
+Object = dependency(\"novacbn/novautils/utilities/Object\").Object\
 local decode, encode\
 do\
   local _obj_0 = dependency(\"rxi/json/main\")\
   decode, encode = _obj_0.decode, _obj_0.encode\
 end\
-local Object\
-Object = dependency(\"novacbn/novautils/utilities/Object\").Object\
 local PROJECT_PATH\
 PROJECT_PATH = dependency(\"novacbn/gmodproj/lib/constants\").PROJECT_PATH\
 local hashSHA1\
@@ -530,8 +532,6 @@ do\
   local _obj_0 = dependency(\"novacbn/gmodproj/lib/logging\")\
   logInfo, logWarn = _obj_0.logInfo, _obj_0.logWarn\
 end\
-local isFile\
-isFile = dependency(\"novacbn/gmodproj/lib/utilities/fs\").isFile\
 local AssetData\
 AssetData = dependency(\"novacbn/gmodproj/schemas/AssetData\").AssetData\
 Asset = Object:extend({\
@@ -548,7 +548,7 @@ Asset = Object:extend({\
   end,\
   generateAsset = function(self)\
     if not (self.assetData) then\
-      if self.isCacheable and self.canCache and isFile(self.cachePath) then\
+      if self.isCacheable and self.canCache and isfileSync(self.cachePath) then\
         local assetData = decode(readFileSync(self.cachePath))\
         local success\
         success, assetData = pcall(AssetData.new, AssetData, assetData)\
@@ -810,12 +810,12 @@ do\
   local _obj_0 = require(\"fs\")\
   existsSync, mkdirSync, writeFileSync = _obj_0.existsSync, _obj_0.mkdirSync, _obj_0.writeFileSync\
 end\
+local isdirSync\
+isdirSync = dependency(\"novacbn/luvit-extras/fs\").isdirSync\
 local Object\
 Object = dependency(\"novacbn/novautils/utilities/Object\").Object\
 local json = dependency(\"rxi/json/main\")\
 local properties = dependency(\"novacbn/properties/exports\")\
-local isDir\
-isDir = dependency(\"novacbn/gmodproj/lib/utilities/fs\").isDir\
 Template = Object:extend({\
   projectAuthor = nil,\
   projectName = nil,\
@@ -828,14 +828,14 @@ Template = Object:extend({\
     if existsSync(directoryPath) then\
       error(\"bad argument #1 to 'createDirectory' (path already exists)\")\
     end\
-    if not (isDir(dirname(directoryPath))) then\
+    if not (isdirSync(dirname(directoryPath))) then\
       error(\"bad argument #1 to 'createDirectory' (parent directory does not exist)\")\
     end\
     return mkdirSync(directoryPath)\
   end,\
   write = function(self, filePath, fileContents)\
     filePath = join(self.projectPath, filePath)\
-    if not (isDir(dirname(filePath))) then\
+    if not (isdirSync(dirname(filePath))) then\
       error(\"bad argument #1 to 'write' (parent directory does not exist)\")\
     end\
     return writeFileSync(filePath, fileContents)\
@@ -861,6 +861,8 @@ local readFileSync\
 readFileSync = require(\"fs\").readFileSync\
 local join\
 join = require(\"path\").join\
+local isfileSync\
+isfileSync = dependency(\"novacbn/luvit-extras/fs\").isfileSync\
 local moonscript = require(\"moonscript/base\")\
 local ENV_ALLOW_UNSAFE_SCRIPTING, PROJECT_PATH, SYSTEM_OS_TYPE, SYSTEM_UNIX_LIKE\
 do\
@@ -879,11 +881,8 @@ do\
   local _obj_0 = dependency(\"novacbn/gmodproj/lib/utilities\")\
   configureEnvironment, readManifest = _obj_0.configureEnvironment, _obj_0.readManifest\
 end\
-local execFormat, isFile\
-do\
-  local _obj_0 = dependency(\"novacbn/gmodproj/lib/utilities/fs\")\
-  execFormat, isFile = _obj_0.execFormat, _obj_0.isFile\
-end\
+local execFormat\
+execFormat = dependency(\"novacbn/gmodproj/lib/utilities/fs\").execFormat\
 local TEMPLATE_EXECUTION_SUCCESS\
 TEMPLATE_EXECUTION_SUCCESS = function(script)\
   return \"Successfully executed '\" .. tostring(script) .. \"'\"\
@@ -903,19 +902,19 @@ end\
 local resolveScript\
 resolveScript = function(script)\
   local scriptPath = join(PROJECT_PATH.bin, script)\
-  if isFile(scriptPath .. \".moon\") then\
+  if isfileSync(scriptPath .. \".moon\") then\
     return function()\
       return moonscript.loadfile(scriptPath .. \".moon\")\
     end\
-  elseif isFile(scriptPath .. \".lua\") then\
+  elseif isfileSync(scriptPath .. \".lua\") then\
     return function()\
       return loadfile(scriptPath .. \".lua\")\
     end\
-  elseif SYSTEM_UNIX_LIKE and isFile(scriptPath .. \".sh\") then\
+  elseif SYSTEM_UNIX_LIKE and isfileSync(scriptPath .. \".sh\") then\
     return nil, function(...)\
       return execFormat(\"/usr/bin/env\", \"sh\", scriptPath .. \".sh\", ...)\
     end\
-  elseif SYSTEM_OS_TYPE == \"Windows\" and isFile(scriptPath .. \".bat\") then\
+  elseif SYSTEM_OS_TYPE == \"Windows\" and isfileSync(scriptPath .. \".bat\") then\
     return nil, function(...)\
       return execFormat(\"cmd.exe\", scriptPath .. \".bat\", ...)\
     end\
@@ -973,6 +972,8 @@ end",
 lower = string.lower\
 local join\
 join = require(\"path\").join\
+local isdirSync\
+isdirSync = dependency(\"novacbn/luvit-extras/fs\").isdirSync\
 local Packager\
 Packager = dependency(\"novacbn/gmodproj/Packager\").Packager\
 local PluginManager\
@@ -993,8 +994,6 @@ do\
   local _obj_0 = dependency(\"novacbn/gmodproj/lib/utilities\")\
   configureEnvironment, readManifest = _obj_0.configureEnvironment, _obj_0.readManifest\
 end\
-local isDir\
-isDir = dependency(\"novacbn/gmodproj/lib/utilities/fs\").isDir\
 formatDescription = function(flags)\
   return \"build [mode]\\t\\t\\t\\tBuilds your project into distributable Lua files\\n\\t\\t\\t\\t\\t\\t\\t(DEFAULT) 'development', 'production'\"\
 end\
@@ -1009,7 +1008,7 @@ executeCommand = function(flags, mode)\
   local resolver = Resolver:new(options:get(\"author\"), options:get(\"name\"), options:get(\"sourceDirectory\"), pluginManager, options:get(\"Resolver\"))\
   local packager = Packager:new(lower(mode) == \"production\", flags, resolver, pluginManager, options:get(\"Packager\"))\
   local buildDirectory = join(PROJECT_PATH.home, options:get(\"buildDirectory\"))\
-  if not (isDir(buildDirectory)) then\
+  if not (isdirSync(buildDirectory)) then\
     logFatal(\"Build directory does not exist!\")\
   end\
   for entryPoint, targetPackage in pairs(options:get(\"projectBuilds\")) do\
@@ -1023,31 +1022,35 @@ end",
 unlinkSync = require(\"fs\").unlinkSync\
 local join\
 join = require(\"path\").join\
+local isdirSync, isfileSync, walkSync\
+do\
+  local _obj_0 = dependency(\"novacbn/luvit-extras/fs\")\
+  isdirSync, isfileSync, walkSync = _obj_0.isdirSync, _obj_0.isfileSync, _obj_0.walkSync\
+end\
 local PROJECT_PATH\
 PROJECT_PATH = dependency(\"novacbn/gmodproj/lib/constants\").PROJECT_PATH\
 local logInfo\
 logInfo = dependency(\"novacbn/gmodproj/lib/logging\").logInfo\
-local collectFiles, isDir\
-do\
-  local _obj_0 = dependency(\"novacbn/gmodproj/lib/utilities/fs\")\
-  collectFiles, isDir = _obj_0.collectFiles, _obj_0.isDir\
-end\
+local collectFiles\
+collectFiles = dependency(\"novacbn/gmodproj/lib/utilities/fs\").collectFiles\
 local cleanDirectory\
 cleanDirectory = function(directory)\
-  local _list_0 = collectFiles(directory)\
+  local _list_0 = walkSync(directory)\
   for _index_0 = 1, #_list_0 do\
     local file = _list_0[_index_0]\
-    unlinkSync(join(directory, file))\
+    if isfileSync(file) then\
+      unlinkSync(file)\
+    end\
   end\
 end\
 formatDescription = function(flags)\
   return \"clean\\t\\t\\t\\t\\tCleans the build cache of the project\"\
 end\
 executeCommand = function(flags)\
-  if isDir(PROJECT_PATH.cache) and not (flags[\"-nc\"] or flags[\"--no-cache\"]) then\
+  if isdirSync(PROJECT_PATH.cache) and not (flags[\"-nc\"] or flags[\"--no-cache\"]) then\
     cleanDirectory(PROJECT_PATH.cache)\
   end\
-  if isDir(PROJECT_PATH.logs) then\
+  if isdirSync(PROJECT_PATH.logs) then\
     if not (flags[\"-nl\"] or flags[\"--no-logs\"]) and (flags[\"-ca\"] or flags[\"-cl\"] or flags[\"--clean-all\"] or flags[\"--clean-logs\"]) then\
       cleanDirectory(PROJECT_PATH.logs)\
     end\
@@ -1344,9 +1347,14 @@ do\
   local _obj_0 = require(\"path\")\
   isAbsolute, join = _obj_0.isAbsolute, _obj_0.join\
 end\
-local moonscript = require(\"moonscript\")\
+local isdirSync, isfileSync\
+do\
+  local _obj_0 = dependency(\"novacbn/luvit-extras/fs\")\
+  isdirSync, isfileSync = _obj_0.isdirSync, _obj_0.isfileSync\
+end\
 local merge\
 merge = dependency(\"novacbn/novautils/table\").merge\
+local moonscript = require(\"moonscript\")\
 local PROJECT_PATH, SYSTEM_OS_ARCH, SYSTEM_OS_TYPE, SYSTEM_UNIX_LIKE\
 do\
   local _obj_0 = dependency(\"novacbn/gmodproj/lib/constants\")\
@@ -1359,10 +1367,10 @@ do\
 end\
 local logError\
 logError = dependency(\"novacbn/gmodproj/lib/logging\").logError\
-local exec, execFormat, isDir, isFile\
+local exec, execFormat\
 do\
   local _obj_0 = dependency(\"novacbn/gmodproj/lib/utilities/fs\")\
-  exec, execFormat, isDir, isFile = _obj_0.exec, _obj_0.execFormat, _obj_0.isDir, _obj_0.isFile\
+  exec, execFormat = _obj_0.exec, _obj_0.execFormat\
 end\
 local assertx = dependency(\"novacbn/gmodproj/lib/utilities/assert\")\
 local ChunkEnvironment\
@@ -1411,11 +1419,11 @@ ChunkEnvironment = function(environmentRoot, allowUnsafe)\
     end,\
     isDir = function(path)\
       path = assertx.argument(getEnvironmentPath(path), 1, \"isDir\", \"expected relative path, got '\" .. tostring(path) .. \"'\")\
-      return isDir(path)\
+      return isdirSync(path)\
     end,\
     isFile = function(path)\
       path = assertx.argument(getEnvironmentPath(path), 1, \"isFile\", \"expected relative path, got '\" .. tostring(path) .. \"'\")\
-      return isFile(path)\
+      return isfileSync(path)\
     end,\
     ipairs = ipairs,\
     mkdir = function(path)\
@@ -1430,7 +1438,7 @@ ChunkEnvironment = function(environmentRoot, allowUnsafe)\
     print = print,\
     read = function(path)\
       path = assertx.argument(getEnvironmentPath(path), 1, \"read\", \"expected relative path, got '\" .. tostring(path) .. \"'\")\
-      assertx.argument(isFile(path), 1, \"read\", \"file '\" .. tostring(path) .. \"' does not exist\")\
+      assertx.argument(isfileSync(path), 1, \"read\", \"file '\" .. tostring(path) .. \"' does not exist\")\
       return readFileSync(path)\
     end,\
     readDataFile = function(path)\
@@ -1441,7 +1449,7 @@ ChunkEnvironment = function(environmentRoot, allowUnsafe)\
     end,\
     remove = function(path)\
       path = assertx.argument(getEnvironmentPath(path), 1, \"remove\", \"expected relative path, got '\" .. tostring(path) .. \"'\")\
-      if isDir(path) then\
+      if isdirSync(path) then\
         rmdir(path)\
       else\
         unlinkSync(path)\
@@ -1496,10 +1504,10 @@ ChunkEnvironment = function(environmentRoot, allowUnsafe)\
       require = function(name)\
         local path = join(PROJECT_PATH.home, name)\
         local loader = nil\
-        if isFile(path .. \".lua\") then\
+        if isfileSync(path .. \".lua\") then\
           path = path .. \".lua\"\
           loader = loadfile\
-        elseif isFile(path .. \".moon\") then\
+        elseif isfileSync(path .. \".moon\") then\
           path = path .. \".moon\"\
           loader = moonscript.loadfile\
         end\
@@ -1564,15 +1572,10 @@ do\
 end\
 local join\
 join = require(\"path\").join\
+local os_homedir\
+os_homedir = require(\"uv\").os_homedir\
 local isAffirmative\
 isAffirmative = dependency(\"novacbn/gmodproj/lib/utilities/string\").isAffirmative\
-local userHome\
-local _exp_0 = os\
-if \"Windows\" == _exp_0 then\
-  userHome = getenv(\"APPDATA\")\
-elseif \"Linux\" == _exp_0 then\
-  userHome = getenv(\"HOME\")\
-end\
 APPLICATION_CORE_VERSION = {\
   0,\
   4,\
@@ -1599,7 +1602,7 @@ do\
 end\
 do\
   local _with_0 = { }\
-  _with_0.data = join(userHome, \".gmodproj\")\
+  _with_0.home = join(os == \"Windows\" and getenv(\"APPDATA\") or os_homedir(), \".gmodproj\")\
   _with_0.applications = join(_with_0.home, \"applications\")\
   _with_0.cache = join(_with_0.home, \"cache\")\
   _with_0.plugins = join(_with_0.home, \"plugins\")\
@@ -1894,6 +1897,11 @@ do\
   local _obj_0 = require(\"fs\")\
   readFileSync, mkdirSync = _obj_0.readFileSync, _obj_0.mkdirSync\
 end\
+local isdirSync, isfileSync\
+do\
+  local _obj_0 = dependency(\"novacbn/luvit-extras/fs\")\
+  isdirSync, isfileSync = _obj_0.isdirSync, _obj_0.isfileSync\
+end\
 local decode\
 decode = dependency(\"novacbn/properties/exports\").decode\
 local PROJECT_PATH\
@@ -1903,24 +1911,19 @@ do\
   local _obj_0 = dependency(\"novacbn/gmodproj/lib/logging\")\
   enableFileLogging, logError, logFatal = _obj_0.enableFileLogging, _obj_0.logError, _obj_0.logFatal\
 end\
-local isDir, isFile\
-do\
-  local _obj_0 = dependency(\"novacbn/gmodproj/lib/utilities/fs\")\
-  isDir, isFile = _obj_0.isDir, _obj_0.isFile\
-end\
 local ProjectOptions\
 ProjectOptions = dependency(\"novacbn/gmodproj/schemas/ProjectOptions\").ProjectOptions\
 configureEnvironment = function()\
-  if not (isDir(PROJECT_PATH.data)) then\
+  if not (isdirSync(PROJECT_PATH.data)) then\
     mkdirSync(PROJECT_PATH.data)\
   end\
-  if not (isDir(PROJECT_PATH.cache)) then\
+  if not (isdirSync(PROJECT_PATH.cache)) then\
     mkdirSync(PROJECT_PATH.cache)\
   end\
-  if not (isDir(PROJECT_PATH.plugins)) then\
+  if not (isdirSync(PROJECT_PATH.plugins)) then\
     mkdirSync(PROJECT_PATH.plugins)\
   end\
-  if not (isDir(PROJECT_PATH.logs)) then\
+  if not (isdirSync(PROJECT_PATH.logs)) then\
     mkdirSync(PROJECT_PATH.logs)\
   end\
   return enableFileLogging()\
@@ -1935,11 +1938,11 @@ makeSync = function(func)\
   end\
 end\
 readManifest = function()\
-  if isDir(PROJECT_PATH.manifest) then\
+  if isdirSync(PROJECT_PATH.manifest) then\
     logFatal(\".gmodmanifest is a directory!\")\
   end\
   local options = { }\
-  if isFile(PROJECT_PATH.manifest) then\
+  if isfileSync(PROJECT_PATH.manifest) then\
     options = decode(readFileSync(PROJECT_PATH.manifest), {\
       propertiesEncoder = \"moonscript\"\
     })\
@@ -1994,6 +1997,8 @@ local join\
 join = require(\"path\").join\
 local nextTick\
 nextTick = process.nextTick\
+local deprecate\
+deprecate = dependency(\"novacbn/gmodproj/lib/utilities/deprecate\").deprecate\
 local PATHS_TO_WATCH = { }\
 local scanTimestamps\
 scanTimestamps = function(directory)\
@@ -2049,6 +2054,7 @@ collectFiles = function(path, paths, base)\
   if base == nil then\
     base = \"\"\
   end\
+  deprecate(\"novacbn/gmodproj/lib/utilities/fs::collectFiles\", \"novacbn/gmodproj/lib/utilities/fs::collectFiles is deprecated, see 0.4.3 changelog\")\
   if not (type(path) == \"string\") then\
     error(\"bad argument #1 to 'collectFiles' (expected string)\")\
   end\
@@ -2095,14 +2101,17 @@ execFormat = function(...)\
   return exec(formatCommand(...))\
 end\
 isDir = function(path)\
+  deprecate(\"novacbn/gmodproj/lib/utilities/fs::isDir\", \"novacbn/gmodproj/lib/utilities/fs::isDir is deprecated, see 0.4.3 changelog\")\
   local fileStats = statSync(path)\
   return fileStats and fileStats.type == \"directory\" or false\
 end\
 isFile = function(path)\
+  deprecate(\"novacbn/gmodproj/lib/utilities/fs::isFile\", \"novacbn/gmodproj/lib/utilities/fs::isFile is deprecated, see 0.4.3 changelog\")\
   local fileStats = statSync(path)\
   return fileStats and fileStats.type == \"file\" or false\
 end\
 watchPath = function(path, callback)\
+  deprecate(\"novacbn/gmodproj/lib/utilities/fs::watchPath\", \"novacbn/gmodproj/lib/utilities/fs::watchPath is deprecated, see 0.4.3 changelog\")\
   if not (type(path) == \"string\") then\
     error(\"bad argument #1 to 'watchPath' (expected string)\")\
   end\
@@ -2153,6 +2162,8 @@ local concat\
 concat = table.concat\
 local makeLookupMap\
 makeLookupMap = dependency(\"novacbn/novautils/table\").makeLookupMap\
+local deprecate\
+deprecate = dependency(\"novacbn/gmodproj/lib/utilities/deprecate\").deprecate\
 local PATTERN_TEMPLATE_TOKEN = \"(%${)(%w+)(})\"\
 local MAP_AFFIRMATIVE_VALUES = makeLookupMap({\
   \"y\",\
@@ -2165,6 +2176,7 @@ isAffirmative = function(userValue)\
   return MAP_AFFIRMATIVE_VALUES[lower(userValue)] or false\
 end\
 makeTemplate = function(stringTemplate)\
+  deprecate(\"novacbn/gmodproj/lib/utilities/string::makeTemplate\", \"novacbn/gmodproj/lib/utilities/string::makeTemplate is deprecated, see 0.4.3 changelog\")\
   return function(templateTokens)\
     return gsub(stringTemplate, PATTERN_TEMPLATE_TOKEN, function(startBoundry, tokenName, endBoundry)\
       local tokenValue = templateTokens[tokenName]\
@@ -2487,6 +2499,636 @@ ResolverOptions = Schema:extend({\
     }\
   }\
 })",
+['novacbn/luvit-extras/adapters/FileSystemAdapter'] = "local type\
+type = _G.type\
+local gsub\
+gsub = string.gsub\
+local access, accessSync, exists, existsSync, readdir, readdirSync, readFile, readFileSync, rename, renameSync, rmdir, rmdirSync, stat, statSync, unlink, unlinkSync, writeFile, writeFileSync, walk, walkSync\
+do\
+  local _obj_0 = require(\"fs\")\
+  access, accessSync, exists, existsSync, readdir, readdirSync, readFile, readFileSync, rename, renameSync, rmdir, rmdirSync, stat, statSync, unlink, unlinkSync, writeFile, writeFileSync, walk, walkSync = _obj_0.access, _obj_0.accessSync, _obj_0.exists, _obj_0.existsSync, _obj_0.readdir, _obj_0.readdirSync, _obj_0.readFile, _obj_0.readFileSync, _obj_0.rename, _obj_0.renameSync, _obj_0.rmdir, _obj_0.rmdirSync, _obj_0.stat, _obj_0.statSync, _obj_0.unlink, _obj_0.unlinkSync, _obj_0.writeFile, _obj_0.writeFileSync, _obj_0.walk, _obj_0.walkSync\
+end\
+local normalize, normalizeSeparators, relative, resolve\
+do\
+  local _obj_0 = require(\"path\")\
+  normalize, normalizeSeparators, relative, resolve = _obj_0.normalize, _obj_0.normalizeSeparators, _obj_0.relative, _obj_0.resolve\
+end\
+local isdirSync\
+do\
+  local _obj_0 = dependency(\"novacbn/luvit-extras/fs\")\
+  isdirSync, walk, walkSync = _obj_0.isdirSync, _obj_0.walk, _obj_0.walkSync\
+end\
+local VirtualAdapter\
+VirtualAdapter = dependency(\"novacbn/luvit-extras/vfs\").VirtualAdapter\
+local PATTERN_SANITIZE_ESCAPE = \"%.%.\"\
+local PATTERN_SANITIZE_SEPARATORS = \"\\\\\"\
+local makeResolvedFunction\
+makeResolvedFunction = function(func, isAsync, sanitizeResults)\
+  if isAsync == nil then\
+    isAsync = false\
+  end\
+  if sanitizeResults == nil then\
+    sanitizeResults = false\
+  end\
+  if isAsync then\
+    return function(self, path, callback)\
+      if sanitizeResults then\
+        return func(self:resolve(path), function(err, results)\
+          return callback(err, self:sanitize(results))\
+        end)\
+      end\
+      return func(self:resolve(path), callback)\
+    end\
+  end\
+  return function(self, path, ...)\
+    local results, err = func(self:resolve(path), ...)\
+    if sanitizeResults then\
+      results = self:sanitize(results)\
+    end\
+    if err then\
+      error(err)\
+    end\
+    return results\
+  end\
+end\
+do\
+  local _with_0 = VirtualAdapter:extend()\
+  _with_0.root = nil\
+  _with_0.initialize = function(self, root, readOnly)\
+    if readOnly == nil then\
+      readOnly = false\
+    end\
+    if not (type(root) == \"string\") then\
+      error(\"bad argument #1 to 'initialize' (expected string)\")\
+    end\
+    root = resolve(root)\
+    if not (isdirSync(root)) then\
+      error(\"bad argument #1 to 'initialize' (expected directory)\")\
+    end\
+    if not (type(readOnly) == \"boolean\") then\
+      error(\"bad argument #2 to 'initialize' (expected boolean)\")\
+    end\
+    self.root = root\
+    return VirtualAdapter.initialize(self, readOnly)\
+  end\
+  _with_0.resolve = function(self, path)\
+    if gsub(path, PATTERN_SANITIZE_ESCAPE, \"\") ~= path then\
+      error(\"bad argument #1 to 'resolve' (unexpected escaping path)\")\
+    end\
+    return resolve(self.root, normalize(path))\
+  end\
+  _with_0.sanitize = function(self, path)\
+    if not (type(path) == \"string\" or \"table\") then\
+      error(\"bad argument #1 'sanitize' (expected string)\")\
+    end\
+    if type(path) == \"string\" then\
+      path = gsub(path, PATTERN_SANITIZE_SEPARATORS, \"/\")\
+      return relative(self.root, path)\
+    end\
+    for index, value in ipairs(path) do\
+      value = gsub(value, PATTERN_SANITIZE_SEPARATORS, \"/\")\
+      path[index] = relative(self.root, value)\
+    end\
+    return path\
+  end\
+  _with_0.access = makeResolvedFunction(access, true)\
+  _with_0.accessSync = makeResolvedFunction(accessSync)\
+  _with_0.readdir = makeResolvedFunction(readdir, true)\
+  _with_0.readdirSync = makeResolvedFunction(readdirSync, false)\
+  _with_0.readFile = makeResolvedFunction(readFile, true)\
+  _with_0.readFileSync = makeResolvedFunction(readFileSync)\
+  _with_0.rmdir = makeResolvedFunction(rmdir, true)\
+  _with_0.rmdirSync = makeResolvedFunction(rmdirSync)\
+  _with_0.stat = makeResolvedFunction(stat, true)\
+  _with_0.statSync = makeResolvedFunction(statSync)\
+  _with_0.unlink = makeResolvedFunction(unlink, true)\
+  _with_0.unlinkSync = makeResolvedFunction(unlinkSync)\
+  _with_0.writeFile = makeResolvedFunction(writeFile, true)\
+  _with_0.writeFileSync = makeResolvedFunction(writeFileSync)\
+  _with_0.walk = makeResolvedFunction(walk, true, true)\
+  _with_0.walkSync = makeResolvedFunction(walkSync, false, true)\
+  FileSystemAdapter = _with_0\
+end",
+['novacbn/luvit-extras/crypto'] = "local type\
+type = _G.type\
+local lower\
+lower = string.lower\
+local Buffer\
+Buffer = require(\"buffer\").Buffer\
+local base64, digest, hex\
+do\
+  local _obj_0 = require(\"openssl\")\
+  base64, digest, hex = _obj_0.base64, _obj_0.digest, _obj_0.hex\
+end\
+local ENCODING_ALGORITHMS = {\
+  buffer = function(data, isEncoding)\
+    if isEncoding then\
+      return Buffer:new(data)\
+    end\
+    return data:toString()\
+  end,\
+  base64 = function(data, isEncoding)\
+    return base64(data, isEncoding)\
+  end,\
+  hex = function(data, isEncoding)\
+    return hex(data, isEncoding)\
+  end\
+}\
+local HASHING_ALGORITHMS\
+do\
+  local _tbl_0 = { }\
+  local _list_0 = digest.list()\
+  for _index_0 = 1, #_list_0 do\
+    local algorithm = _list_0[_index_0]\
+    _tbl_0[algorithm] = true\
+  end\
+  HASHING_ALGORITHMS = _tbl_0\
+end\
+local isBuffer\
+isBuffer = function(value)\
+  return type(value) == \"table\" and value.meta == Buffer.meta or false\
+end\
+createHash = function(data, algorithm, encoding)\
+  if encoding == nil then\
+    encoding = \"hex\"\
+  end\
+  if not (isBuffer(data) or type(data) == \"string\") then\
+    error(\"bad argument #1 to 'createHash' (expected string)\")\
+  end\
+  if not (type(data) == \"string\") then\
+    error(\"bad argument #2 to 'createHash' (expected string)\")\
+  end\
+  if not (HASHING_ALGORITHMS[algorithm]) then\
+    error(\"bad argument #2 to 'createHash' (unexpected algorithm)\")\
+  end\
+  if isBuffer(data) then\
+    data = data:toString()\
+  end\
+  return encodeData(digest.digest(algorithm, data, true), encoding)\
+end\
+decodeData = function(data, encoding)\
+  if not (isBuffer(data) or type(data) == \"string\") then\
+    error(\"bad argument #1 to 'decodeData' (expected string)\")\
+  end\
+  if not (type(encoding) == \"string\") then\
+    error(\"bad argument #2 to 'decodeData' (expected string)\")\
+  end\
+  encoding = lower(encoding)\
+  if not (ENCODING_ALGORITHMS[encoding]) then\
+    error(\"bad argument #2 to 'decodeData' (unexpected encoding)\")\
+  end\
+  if encoding == \"buffer\" then\
+    if not (isBuffer(data)) then\
+      error(\"bad argument #1 to 'decodeData' (expected Buffer)\")\
+    end\
+  elseif isBuffer(data) then\
+    data = data:toString()\
+  end\
+  return ENCODING_ALGORITHMS[encoding](data, false)\
+end\
+encodeData = function(data, encoding)\
+  if not (isBuffer(data) or type(data) == \"string\") then\
+    error(\"bad argument #1 to 'encodeData' (expected string)\")\
+  end\
+  if not (type(encoding) == \"string\") then\
+    error(\"bad argument #2 to 'encodeData' (expected string)\")\
+  end\
+  encoding = lower(encoding)\
+  if not (ENCODING_ALGORITHMS[encoding]) then\
+    error(\"bad argument #2 to 'encodeData' (unexpected encoding)\")\
+  end\
+  if encoding == \"buffer\" then\
+    if not (type(data) == \"string\") then\
+      error(\"bad argument #1 to 'encodeData' (expected string)\")\
+    end\
+  elseif isBuffer(data) then\
+    data = data:toString()\
+  end\
+  return ENCODING_ALGORITHMS[encoding](data, true)\
+end",
+['novacbn/luvit-extras/exports'] = "local adapters\
+do\
+  local _with_0 = { }\
+  _with_0.FileSystemAdapter = dependency(\"novacbn/luvit-extras/adapters/FileSystemAdapter\").FileSystemAdapter\
+  adapters = _with_0\
+end\
+do\
+  local _with_0 = exports\
+  _with_0.adapters = adapters\
+  _with_0.crypto = dependency(\"novacbn/luvit-extras/crypto\")\
+  _with_0.fs = dependency(\"novacbn/luvit-extras/fs\")\
+  _with_0.process = dependency(\"novacbn/luvit-extras/process\")\
+  _with_0.vfs = dependency(\"novacbn/luvit-extras/vfs\")\
+  return _with_0\
+end",
+['novacbn/luvit-extras/fs'] = "local ipairs, pairs, type\
+do\
+  local _obj_0 = _G\
+  ipairs, pairs, type = _obj_0.ipairs, _obj_0.pairs, _obj_0.type\
+end\
+local insert\
+insert = table.insert\
+local access, accessSync, readdir, readdirSync, stat, statSync\
+do\
+  local _obj_0 = require(\"fs\")\
+  access, accessSync, readdir, readdirSync, stat, statSync = _obj_0.access, _obj_0.accessSync, _obj_0.readdir, _obj_0.readdirSync, _obj_0.stat, _obj_0.statSync\
+end\
+local join\
+join = require(\"path\").join\
+local setTimeout\
+setTimeout = require(\"timer\").setTimeout\
+local nextTick\
+nextTick = process.nextTick\
+local handleStat\
+handleStat = function(path, check, callback)\
+  access(path, function(err)\
+    if err then\
+      return callback(err, false)\
+    end\
+    return stat(path, function(err, stats)\
+      if err or stats.type ~= check then\
+        return callback(err, false)\
+      end\
+      return callback(nil, true)\
+    end)\
+  end)\
+  return nil\
+end\
+local DirectoryPoll\
+DirectoryPoll = function(directory, tickRate, callback)\
+  return {\
+    closed = false,\
+    directory = directory,\
+    files = { },\
+    type = \"directory\",\
+    close = function(self, reason)\
+      if reason == nil then\
+        reason = \"DirectoryPoll was closed\"\
+      end\
+      self.closed = true\
+      callback(reason, nil)\
+      return nil\
+    end,\
+    scan = function(self)\
+      if self.closed then\
+        return \
+      end\
+      return walk(directory, function(err, names)\
+        if err then\
+          return self:close(err)\
+        end\
+        for name, entry in pairs(self.files) do\
+          entry.checked = false\
+        end\
+        local entry, lastModified\
+        for _index_0 = 1, #names do\
+          local _continue_0 = false\
+          repeat\
+            local name = names[_index_0]\
+            if not (isfileSync(name)) then\
+              _continue_0 = true\
+              break\
+            end\
+            entry = self.files[name]\
+            if entry then\
+              entry.checked = true\
+              lastModified = statSync(name).mtime.sec\
+              if not (entry.lastModified == lastModified) then\
+                entry.lastModified = lastModified\
+                callback(nil, \"changed\", name)\
+              end\
+            else\
+              self.files[name] = {\
+                checked = true,\
+                lastModified = statSync(name).mtime.sec\
+              }\
+              callback(nil, \"renamed\", name)\
+            end\
+            _continue_0 = true\
+          until true\
+          if not _continue_0 then\
+            break\
+          end\
+        end\
+        for name, entry in pairs(self.files) do\
+          if not (entry.checked) then\
+            self.files[name] = nil\
+            callback(nil, \"renamed\", name)\
+          end\
+        end\
+        if tickRate == 0 then\
+          return nextTick((function()\
+            local _base_0 = self\
+            local _fn_0 = _base_0.scan\
+            return function(...)\
+              return _fn_0(_base_0, ...)\
+            end\
+          end)())\
+        else\
+          return setTimeout(tickRate, (function()\
+            local _base_0 = self\
+            local _fn_0 = _base_0.scan\
+            return function(...)\
+              return _fn_0(_base_0, ...)\
+            end\
+          end)())\
+        end\
+      end)\
+    end\
+  }\
+end\
+local FilePoll\
+FilePoll = function(file, tickRate, callback)\
+  return {\
+    closed = false,\
+    file = file,\
+    lastModified = statSync(file).mtime.sec,\
+    type = \"file\",\
+    close = function(self, reason)\
+      if reason == nil then\
+        reason = \"FilePoll was closed\"\
+      end\
+      self.closed = true\
+      callback(reason, nil)\
+      return nil\
+    end,\
+    scan = function(self)\
+      if self.closed then\
+        return \
+      end\
+      return access(file, function(err)\
+        if err then\
+          return self:close(err)\
+        end\
+        return stat(file, function(err, stats)\
+          if err then\
+            return self:close(err)\
+          end\
+          if stats.mtime.sec ~= self.lastModified then\
+            self.lastModified = stats.mtime.sec\
+            callback(nil, file)\
+          end\
+          if tickRate == 0 then\
+            return nextTick((function()\
+              local _base_0 = self\
+              local _fn_0 = _base_0.scan\
+              return function(...)\
+                return _fn_0(_base_0, ...)\
+              end\
+            end)())\
+          else\
+            return setTimeout(tickRate, (function()\
+              local _base_0 = self\
+              local _fn_0 = _base_0.scan\
+              return function(...)\
+                return _fn_0(_base_0, ...)\
+              end\
+            end)())\
+          end\
+        end)\
+      end)\
+    end\
+  }\
+end\
+isdir = function(directory, callback)\
+  if not (type(directory) == \"string\") then\
+    error(\"bad argument #1 to 'isdir' (expected string)\")\
+  end\
+  if not (type(callback) == \"function\") then\
+    error(\"bad argument #2 to 'isdir' (expected function)\")\
+  end\
+  return handleStat(directory, \"directory\", callback)\
+end\
+isdirSync = function(directory)\
+  if not (type(directory) == \"string\") then\
+    error(\"bad argument #1 to 'isdir' (expected string)\")\
+  end\
+  return accessSync(directory) and statSync(directory).type == \"directory\" and true or false\
+end\
+isfile = function(file, callback)\
+  if not (type(file) == \"string\") then\
+    error(\"bad argument #1 to 'isfile' (expected string)\")\
+  end\
+  if not (type(callback) == \"function\") then\
+    error(\"bad argument #2 to 'isfile' (expected function)\")\
+  end\
+  return handleStat(file, \"file\", callback)\
+end\
+isfileSync = function(file)\
+  if not (type(file) == \"string\") then\
+    error(\"bad argument #1 to 'isfileSync' (expected string)\")\
+  end\
+  return accessSync(file) and statSync(file).type == \"file\" and true or false\
+end\
+walk = function(directory, callback, results)\
+  if results == nil then\
+    results = { }\
+  end\
+  if not (type(directory) == \"string\") then\
+    error(\"bad argument #1 to 'walk' (expected string)\")\
+  end\
+  if not (type(callback) == \"function\") then\
+    error(\"bad argument #2 to 'walk' (expected function)\")\
+  end\
+  return readdir(directory, function(err, names)\
+    if err then\
+      return callback(err, nil)\
+    end\
+    local pending = #names\
+    if pending < 1 then\
+      return callback(nil, results)\
+    end\
+    for _index_0 = 1, #names do\
+      local name = names[_index_0]\
+      name = join(directory, name)\
+      stat(name, function(err, stats)\
+        insert(results, name)\
+        if stats and stats.type == \"directory\" then\
+          return walk(name, function()\
+            pending = pending - 1\
+            if pending < 1 then\
+              return callback(nil, results)\
+            end\
+          end, results)\
+        else\
+          pending = pending - 1\
+          if pending < 1 then\
+            return callback(nil, results)\
+          end\
+        end\
+      end)\
+    end\
+  end)\
+end\
+walkSync = function(directory, results)\
+  if results == nil then\
+    results = { }\
+  end\
+  if not (type(directory) == \"string\") then\
+    error(\"bad argument #1 to 'walkSync' (expected string)\")\
+  end\
+  if not (isdirSync(directory)) then\
+    error(\"bad argument #1 to 'walkSync' (no such directory)\")\
+  end\
+  local stats\
+  local _list_0 = readdirSync(directory)\
+  for _index_0 = 1, #_list_0 do\
+    local name = _list_0[_index_0]\
+    name = join(directory, name)\
+    insert(results, name)\
+    stats = statSync(name)\
+    if stats and stats.type == \"directory\" then\
+      walkSync(name, results)\
+    end\
+  end\
+  return results\
+end\
+watchPoll = function(path, tickRate, listener)\
+  if type(tickRate) == \"function\" then\
+    listener = tickRate\
+    tickRate = 0\
+  end\
+  if not (type(path) == \"string\") then\
+    error(\"bad argument #1 to 'watch' (expected string)\")\
+  end\
+  if not (isdirSync(path) or isfileSync(path)) then\
+    error(\"bad argument #1 to 'watch' (expected directory or file)\")\
+  end\
+  if not (type(tickRate) == \"number\") then\
+    error(\"bad argument #2 to 'watch' (expected number)\")\
+  end\
+  if not (tickRate > -1) then\
+    error(\"bad argument #2 to 'watch' (expected positive tick rate)\")\
+  end\
+  if not (type(listener) == \"function\") then\
+    error(\"bad argument #3 to 'watch' (expected function)\")\
+  end\
+  local entry = isdirSync(path) and DirectoryPoll(path, tickRate, listener) or FilePoll(path, tickRate, listener)\
+  nextTick((function()\
+    local _base_0 = entry\
+    local _fn_0 = _base_0.scan\
+    return function(...)\
+      return _fn_0(_base_0, ...)\
+    end\
+  end)())\
+  return entry\
+end",
+['novacbn/luvit-extras/process'] = "local uv = require(\"uv\")\
+local makeAdaptedSync\
+makeAdaptedSync = dependency(\"novacbn/luvit-extras/utils\").makeAdaptedSync\
+chdir = makeAdaptedSync(uv.chdir)\
+exepath = makeAdaptedSync(uv.exepath)\
+homedir = makeAdaptedSync(uv.os_homedir)\
+tmpdir = makeAdaptedSync(uv.os_tmpdir)",
+['novacbn/luvit-extras/utils'] = "makeAdaptedSync = function(func)\
+  return function(...)\
+    local results, err = func(...)\
+    if err then\
+      error(err)\
+    end\
+    return results\
+  end\
+end",
+['novacbn/luvit-extras/vfs'] = "local type\
+type = _G.type\
+local match\
+match = string.match\
+local Emitter, Object\
+do\
+  local _obj_0 = require(\"core\")\
+  Emitter, Object = _obj_0.Emitter, _obj_0.Object\
+end\
+local PATTERN_URI_SCHEME = \"^(%l[%l%d%-]*)$\"\
+local PATTERN_URI_PARTS = \"^(%l[%l%d%-]*)://([%w%-%./]*)$\"\
+local PATTERN_URI_PATH = \"^([%w%-%./]+)$\"\
+local makeAdapterBind\
+makeAdapterBind = function(method, isAction)\
+  return function(self, uri, ...)\
+    if not (type(uri) == \"string\") then\
+      error(\"bad argument #1 to '\" .. tostring(method) .. \"' (expected string)\")\
+    end\
+    local scheme, path = match(uri, PATTERN_URI_PARTS)\
+    if not (scheme) then\
+      error(\"bad argument #1 to '\" .. tostring(method) .. \"' (malformed URI)\")\
+    end\
+    local adapter = self.adapters[scheme]\
+    if not (adapter) then\
+      error(\"bad argument #1 to '\" .. tostring(method) .. \"' (unknown URI scheme)\")\
+    end\
+    return adapter[method](adapter, path, ...)\
+  end\
+end\
+do\
+  local _with_0 = Emitter:extend()\
+  _with_0.readOnly = false\
+  _with_0.initialize = function(self, readOnly)\
+    self.readOnly = readOnly\
+  end\
+  _with_0.mounted = function(self) end\
+  _with_0.dismounted = function(self) end\
+  _with_0.emit = function(self, event, ...)\
+    if self[event] then\
+      self[event](self, ...)\
+    end\
+    return Emitter.emit(self, event, ...)\
+  end\
+  VirtualAdapter = _with_0\
+end\
+do\
+  local _with_0 = Object:extend()\
+  _with_0.adapters = nil\
+  _with_0.initialize = function(self)\
+    self.adapters = { }\
+  end\
+  _with_0.mount = function(self, scheme, adapter)\
+    if not (type(scheme) == \"string\") then\
+      error(\"bad argument #1 to 'mount' (expected string)\")\
+    end\
+    if not (match(scheme, PATTERN_URI_SCHEME)) then\
+      error(\"bad argument #1 to 'mount' (unexpected URI scheme)\")\
+    end\
+    if self.adapters[scheme] then\
+      error(\"bad argument #1 to 'mount' (expected unmounted scheme)\")\
+    end\
+    if not (type(adapter) == \"table\") then\
+      error(\"bad argument #2 to 'mount' (expected VirtualAdapter)\")\
+    end\
+    self.adapters[scheme] = adapter\
+    adapter:emit(\"mounted\", self)\
+    return self\
+  end\
+  _with_0.dismount = function(self, scheme)\
+    if not (type(scheme) == \"string\") then\
+      error(\"bad argument #1 to 'dismount' (expected string)\")\
+    end\
+    if not (match(scheme, PATTERN_URI_SCHEME)) then\
+      error(\"bad argument #1 to 'mount' (malformed URI scheme)\")\
+    end\
+    if not (self.adapters[scheme]) then\
+      error(\"bad argument #1 to 'dismount' (expected mounted scheme)\")\
+    end\
+    self.adapters[scheme] = nil\
+    adapter:emit(\"dismounted\", self)\
+    return self\
+  end\
+  _with_0.access = makeAdapterBind(\"access\")\
+  _with_0.accessSync = makeAdapterBind(\"accessSync\")\
+  _with_0.readdir = makeAdapterBind(\"readdir\")\
+  _with_0.readdirSync = makeAdapterBind(\"readdirSync\")\
+  _with_0.readFile = makeAdapterBind(\"readFile\")\
+  _with_0.readFileSync = makeAdapterBind(\"readFileSync\")\
+  _with_0.rmdir = makeAdapterBind(\"rmdir\", true)\
+  _with_0.rmdirSync = makeAdapterBind(\"rmdirSync\", true)\
+  _with_0.stat = makeAdapterBind(\"stat\")\
+  _with_0.statSync = makeAdapterBind(\"statSync\")\
+  _with_0.unlink = makeAdapterBind(\"unlink\", true)\
+  _with_0.unlinkSync = makeAdapterBind(\"unlinkSync\", true)\
+  _with_0.writeFile = makeAdapterBind(\"writeFile\", true)\
+  _with_0.writeFileSync = makeAdapterBind(\"writeFileSync\", true)\
+  _with_0.walk = makeAdapterBind(\"walk\")\
+  _with_0.walkSync = makeAdapterBind(\"walkSync\")\
+  VirtualFileSystem = _with_0\
+end",
 ['novacbn/novautils/bit'] = "if bit then\
   exports.arshift = bit.arshift\
   exports.band = bit.band\

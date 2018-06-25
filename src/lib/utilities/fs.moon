@@ -7,6 +7,8 @@ import readdirSync, statSync from require "fs"
 import join from require "path"
 import nextTick from process
 
+import deprecate from "novacbn/gmodproj/lib/utilities/deprecate"
+
 -- ::PATHS_TO_WATCH -> table
 -- Represents the filesystem paths designated for watching for modifications
 --
@@ -53,6 +55,8 @@ watchLoop = () ->
 --
 -- export
 export collectFiles = (path, paths={}, base="") ->
+    deprecate("novacbn/gmodproj/lib/utilities/fs::collectFiles", "novacbn/gmodproj/lib/utilities/fs::collectFiles is deprecated, see 0.4.3 changelog")
+
     error("bad argument #1 to 'collectFiles' (expected string)") unless type(path) == "string"
     error("bad argument #1 to 'collectFiles' (invalid path)") unless isDir(path) or isFile(path)
     error("bad argument #2 to 'collectFiles' (expected table)") unless type(paths) == "table"
@@ -103,6 +107,8 @@ export execFormat = (...) ->
 -- Returns if the path is a directory
 -- export
 export isDir = (path) ->
+    deprecate("novacbn/gmodproj/lib/utilities/fs::isDir", "novacbn/gmodproj/lib/utilities/fs::isDir is deprecated, see 0.4.3 changelog")
+
     fileStats = statSync(path)
     return fileStats and fileStats.type == "directory" or false
 
@@ -110,6 +116,7 @@ export isDir = (path) ->
 -- Returns if the path is a file
 -- export
 export isFile = (path) ->
+    deprecate("novacbn/gmodproj/lib/utilities/fs::isFile", "novacbn/gmodproj/lib/utilities/fs::isFile is deprecated, see 0.4.3 changelog")
 
     fileStats = statSync(path)
     return fileStats and fileStats.type == "file" or false
@@ -118,6 +125,8 @@ export isFile = (path) ->
 -- Watches the specified path for changes
 -- export
 export watchPath = (path, callback) ->
+    deprecate("novacbn/gmodproj/lib/utilities/fs::watchPath", "novacbn/gmodproj/lib/utilities/fs::watchPath is deprecated, see 0.4.3 changelog")
+
     error("bad argument #1 to 'watchPath' (expected string)") unless type(path) == "string"
     error("bad argument #1 to 'watchPath' (invalid path)") unless isDir(path) or isFile(path)
     error("bad argument #2 to 'watchPath' (expected function)") unless type(callback) == "function"
