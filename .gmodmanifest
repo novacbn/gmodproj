@@ -1,6 +1,6 @@
 name:       "gmodproj"
 author:     "novacbn"
-version:    "0.4.1"
+version:    "0.4.3"
 repository: "github://novacbn/gmodproj"
 
 buildDirectory: "build"
@@ -12,8 +12,9 @@ Packager:
     targetPlatform: "lua"
 
     includedAssets: {
-        -- Include installed version of novautils as a supplemental std for applications and plugins
+        -- Include below packages as supplemental std for applications and plugins
         "novacbn/novautils/*"
+        "novacbn/luvit-extras/*"
     }
 
 Plugins:
