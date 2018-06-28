@@ -7,7 +7,7 @@
     * Accepted schemes
         * `git://path`
         * `github://username/package`
-    * Accepts repository tags, e.g. `0.1.1@gmodproj add github://novacbn/properties`
+    * Accepts repository tags, e.g. `gmodproj add 0.2.0@github://novacbn/gmodproj-plugin-builtin`
         * By default, uses latest repository tag
         * Semantic versioning is not currently handled, WYSIWYG
 * Refactored CLI to use [novacbn/command-ops](https://github.com/novacbn/command-ops)
