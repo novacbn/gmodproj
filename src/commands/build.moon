@@ -11,37 +11,58 @@ import ElapsedTimer from "novacbn/gmodproj/lib/ElapsedTimer"
 import logFatal, logInfo from "novacbn/gmodproj/lib/logging"
 import configureEnvironment, readManifest from "novacbn/gmodproj/lib/utilities"
 
--- ::formatDescription(table flags) -> string
--- Formats the help description of the command
+-- ::TEXT_COMMAND_DESCRIPTION -> string
+-- Represents the description of the command
 -- export
-export formatDescription = (flags) ->
-    return "build [mode]\t\t\t\tBuilds your project into distributable Lua files\n\t\t\t\t\t\t\t(DEFAULT) 'development', 'production'"
+export TEXT_COMMAND_DESCRIPTION = "Builds the project into distributable files"
 
--- ::executeCommand(table flags, string mode?) -> void
+-- ::TEXT_COMMAND_SYNTAX -> string
+-- Represents the syntax of the command
+-- export
+export TEXT_COMMAND_SYNTAX = "[mode]"
+
+-- ::TEXT_COMMAND_EXAMPLES -> string
+-- Represents the examples of the command
+-- export
+export TEXT_COMMAND_EXAMPLES = {
+    "development"
+    "production"
+}
+
+-- ::configureCommand(Options options) -> void
+-- Configures the input of the command
+-- export
+export configureCommand = (options) ->
+    with options
+        \boolean "no-cache", "Disables caching of built project files"
+        \boolean "no-logs", "Disables logging to files"
+        \boolean "quiet", "Disables logging to console"
+
+-- ::executeCommand(Options options, string mode?) -> void
 -- Builds the project found in the current working directory
 -- export
-export executeCommand = (flags, mode="development") ->
+export executeCommand = (options, mode="development") ->
     -- Configure the application environment for building
     configureEnvironment()
     elapsedTimer    = ElapsedTimer\new()
-    options         = readManifest()
+    manifest        = readManifest()
 
     -- Make and configure new Resolver and Packager for building
-    pluginManager   = PluginManager\new(options\get("Plugins"))
+    pluginManager   = PluginManager\new(manifest\get("Plugins"))
     resolver        = Resolver\new(
-        options\get("author"),
-        options\get("name"),
-        options\get("sourceDirectory"),
-        pluginManager, options\get("Resolver")
+        manifest\get("author"),
+        manifest\get("name"),
+        manifest\get("sourceDirectory"),
+        pluginManager, manifest\get("Resolver")
     )
 
-    packager = Packager\new(lower(mode) == "production", flags, resolver, pluginManager, options\get("Packager"))
+    packager = Packager\new(lower(mode) == "production", options, resolver, pluginManager, manifest\get("Packager"))
 
     -- Build a distributable package for each specified project build
-    buildDirectory = join(PROJECT_PATH.home, options\get("buildDirectory"))
+    buildDirectory = join(PROJECT_PATH.home, manifest\get("buildDirectory"))
     logFatal("Build directory does not exist!") unless isdirSync(buildDirectory)
 
-    for entryPoint, targetPackage in pairs(options\get("projectBuilds"))
+    for entryPoint, targetPackage in pairs(manifest\get("projectBuilds"))
         logInfo("Building entry point '#{entryPoint}'")
         packager\writePackage(entryPoint, join(
             buildDirectory,

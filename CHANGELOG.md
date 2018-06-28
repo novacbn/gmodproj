@@ -1,5 +1,27 @@
 # gmodproj changelog
 
+## 0.5.0
+* Added `gmodproj add <...packages>`, `gmodproj install`, and `gmodproj remove <...packages>`
+    * e.g. `gmodproj add github://novacbn/properties`
+    * Format for Package URIs `scheme://path`
+    * Accepted schemes
+        * `git://path`
+        * `github://username/package`
+    * Accepts repository tags, e.g. `0.1.1@gmodproj add github://novacbn/properties`
+        * By default, uses latest repository tag
+        * Semantic versioning is not currently handled, WYSIWYG
+* Refactored CLI to use [novacbn/command-ops](https://github.com/novacbn/command-ops)
+* Updated CLI to use environmental variables for all flags
+    * For `gmodproj build` flags such as `--no-cache` you can use `export GMODPROJ_NO_CACHE=y`
+* Fixed CLI not accepting arguments that contain dashes
+* Removed the following deprecated API and features
+    * [0.4.3](#0.4.3)
+        * `novacbn/gmodproj/lib/utilities/openssl`
+    * [0.4.2](#0.4.2)
+        * `-nf`, `--no-logs` - CLI Flag
+    * [0.4.0](#0.4.0)
+        * `novacbn/gmodproj/lib/datafile`
+
 ## 0.4.3
 * Added [novacbn/luvit-extras](https://github.com/novacbn/luvit-extras) for extended `luvit` API features
 * Added testing for these CLI commands

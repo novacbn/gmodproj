@@ -9,33 +9,52 @@ import watchPath from "novacbn/gmodproj/lib/utilities/fs"
 bin     = dependency "novacbn/gmodproj/commands/bin"
 build   = dependency "novacbn/gmodproj/commands/build"
 
--- ::makeBinding(table flags, string script, string ...) -> function
+-- ::makeBinding(Options options, string script, string ...) -> function
 -- Make a bound function depending on if a script is specified
 --
-makeBinding = (flags, script, ...) ->
+makeBinding = (options, script, ...) ->
     if script then
         args = pack(...)
-        return -> bin.executeCommand(flags, script, unpack(args))
+        return -> bin.executeCommand(options, script, unpack(args))
 
-    return -> build.executeCommand(flags, "development")
+    return -> build.executeCommand(options, "development")
 
--- ::formatDescription(table flags) -> string
--- Formats the help description of the command
+-- ::TEXT_COMMAND_DESCRIPTION -> string
+-- Represents the description of the command
 -- export
-export formatDescription = (flags) ->
-    return "watch [script]\t\t\t\tWatches the source directory for changes and rebuilds in development\n\t\t\t\t\t\t\tExecutes a script instead, if specified"
+export TEXT_COMMAND_DESCRIPTION = "Watches the project for changes and rebuilds"
 
--- ::executeCommand(table flags, string script?) -> void
+-- ::TEXT_COMMAND_SYNTAX -> string
+-- Represents the syntax of the command
+-- export
+export TEXT_COMMAND_SYNTAX = "[script] [...args]"
+
+-- ::TEXT_COMMAND_EXAMPLES -> string
+-- Represents the examples of the command
+-- export
+export TEXT_COMMAND_EXAMPLES = {
+    ""
+    "build development"
+}
+
+-- ::configureCommand(Options options) -> void
+-- Configures the input of the command
+-- export
+export configureCommand = (options) ->
+    with options
+        \boolean "watch-search", "Watches configured search pathes in the project manifest"
+
+-- ::executeCommand(Options options, string script?) -> void
 -- Watches the project's source directory, and search paths if specified, for rebuilding
 -- export
 export executeCommand = (flags, script, ...) ->
-    options = readManifest()
+    manifest = readManifest()
 
     -- Retrieve the 'gmodproj bin [script] [...]' binding if a script is specified, otherwise use a 'gmodproj build development' binding
     modificationBind = makeBinding(flags, script, ...)
 
     -- Start watching the source directory for modifications
-    watchPath(options\get("sourceDirectory"), modificationBind)
+    watchPath(manifest\get("sourceDirectory"), modificationBind)
 
     -- If specified, also watch the package search paths
     if flags["-ws"] or flags["--watch-search"]

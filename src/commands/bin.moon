@@ -57,17 +57,28 @@ resolveScript = (script) ->
     elseif SYSTEM_OS_TYPE == "Windows" and isfileSync(scriptPath..".bat")
         return nil, (...) -> execFormat("cmd.exe", scriptPath..".bat", ...)
 
-
--- ::formatDescription(table flags) -> string
--- Formats the help description of the command
+-- ::TEXT_COMMAND_DESCRIPTION -> string
+-- Represents the description of the command
 -- export
-export formatDescription = (flags) ->
-    return "bin <script>\t\t\t\tExecutes a utility script located in your project's 'bin' directory"
+export TEXT_COMMAND_DESCRIPTION = "Executes a utility script from the project"
 
--- ::executeCommand(table flags, string script, ...) -> void
+-- ::TEXT_COMMAND_SYNTAX -> string
+-- Represents the syntax of the command
+-- export
+export TEXT_COMMAND_SYNTAX = "<script> [...args]"
+
+-- ::TEXT_COMMAND_EXAMPLES -> string
+-- Represents the examples of the command
+-- export
+export TEXT_COMMAND_EXAMPLES = {
+    "build"
+    "test"
+}
+
+-- ::executeCommand(Options options, string script, ...) -> void
 -- Executes a specified script from the project's bin directory
 -- export
-export executeCommand = (flags, script, ...) ->
+export executeCommand = (options, script, ...) ->
     -- Configure the application's environment
     configureEnvironment()
 

@@ -9,7 +9,7 @@ import isAffirmative from "novacbn/gmodproj/lib/utilities/string"
 -- ::APPLICATION_CORE_VERSION -> table
 -- Represents the current version of the application
 -- export
-export APPLICATION_CORE_VERSION = {0, 4, 3}
+export APPLICATION_CORE_VERSION = {0, 5, 0}
 
 -- ::ENV_ALLOW_UNSAFE_SCRIPTING -> boolean
 -- Represents a environment variable flag if gmodproj should allow unsafe scripting

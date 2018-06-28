@@ -2,12 +2,12 @@ import pcall from _G
 
 import readFileSync, statSync, writeFileSync from require "fs"
 import join from require "path"
+import createHash from "novacbn/luvit-extras/crypto"
 import isfileSync from "novacbn/luvit-extras/fs"
 import Object from "novacbn/novautils/utilities/Object"
 import decode, encode from "rxi/json/main"
 
 import PROJECT_PATH from "novacbn/gmodproj/lib/constants"
-import hashSHA1 from "novacbn/gmodproj/lib/utilities/openssl"
 import logInfo, logWarn from "novacbn/gmodproj/lib/logging"
 import AssetData from "novacbn/gmodproj/schemas/AssetData"
 

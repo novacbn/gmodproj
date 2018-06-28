@@ -7,14 +7,13 @@ import APPLICATION_CORE_VERSION from "novacbn/gmodproj/lib/constants"
 -- export
 export TEXT_COMMAND_VERSION = "#{APPLICATION_CORE_VERSION[1]}.#{APPLICATION_CORE_VERSION[2]}.#{APPLICATION_CORE_VERSION[3]} Pre-alpha"
 
--- ::formatDescription(table flags) -> string
--- Formats the help description of the command
+-- ::TEXT_COMMAND_DESCRIPTION -> string
+-- Represents the description of the command
 -- export
-export formatDescription = (flags) ->
-    return "version\t\t\t\t\tDisplays the version text of application"
+export TEXT_COMMAND_DESCRIPTION = "Displays the current version of gmodproj"
 
--- ::executeCommand(table flags) -> void
+-- ::executeCommand(Options options) -> void
 -- Prints the version of the application to console
 -- export
-export executeCommand = (flags) ->
+export executeCommand = (options) ->
     print(TEXT_COMMAND_VERSION)

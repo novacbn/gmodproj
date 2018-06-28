@@ -1,9 +1,10 @@
 import ipairs, type from _G
 import popen from io
+import tmpname from os
 import match from string
 import concat, insert from table
 
-import readdirSync, statSync from require "fs"
+import mkdirSync, readdirSync, statSync, unlinkSync from require "fs"
 import join from require "path"
 import nextTick from process
 
@@ -120,6 +121,15 @@ export isFile = (path) ->
 
     fileStats = statSync(path)
     return fileStats and fileStats.type == "file" or false
+
+-- ::tmpdir() -> string
+-- Create and returns a directory in the system's temporary directory
+-- export
+export tmpdir = () ->
+    name = tmpname()
+    unlinkSync(name)
+    mkdirSync(name)
+    return name
 
 -- ::watchPath(string path, function callback) -> void
 -- Watches the specified path for changes

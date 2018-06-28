@@ -1,4 +1,4 @@
-import hashSHA256 from dependency "novacbn/gmodproj/lib/utilities/openssl"
+import createHash from dependency "novacbn/gmodproj/lib/utilities/openssl"
 
 -- Configure the environment for building
 buildMode       = ({...})[1] or "production"

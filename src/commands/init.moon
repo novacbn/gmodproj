@@ -45,16 +45,15 @@ validatedPrompt = (question, check, err, default) ->
 
     return answer
 
--- ::formatDescription() -> string
--- Formats the help description of the command
+-- ::TEXT_COMMAND_DESCRIPTION -> string
+-- Represents the description of the command
 -- export
-export formatDescription = () ->
-    return "init\t\t\t\t\tInitializes an already existing project to work with gmodproj"
+export TEXT_COMMAND_DESCRIPTION = "Initializes an existing project to work with gmodproj"
 
--- ::executeCommand(table flags) -> void
+-- ::executeCommand(Options options) -> void
 -- Initializes the current working directory as a gmodproj project
 -- export
-export executeCommand = wrap((flags) ->
+export executeCommand = wrap (options) ->
     -- Prompt the user for project metadata
     directoryName   = basename(PROJECT_PATH.home)
     projectName     = validatedPrompt(
@@ -117,4 +116,3 @@ export executeCommand = wrap((flags) ->
     }, {propertiesEncoder: "moonscript"})
 
     writeFileSync(join(PROJECT_PATH.home, ".gmodmanifest"), encoded)
-)

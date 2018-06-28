@@ -15,7 +15,6 @@ import merge from "novacbn/novautils/table"
 moonscript = require "moonscript"
 
 import PROJECT_PATH, SYSTEM_OS_ARCH, SYSTEM_OS_TYPE, SYSTEM_UNIX_LIKE from "novacbn/gmodproj/lib/constants"
-import fromString, toString from "novacbn/gmodproj/lib/datafile"
 import logError from "novacbn/gmodproj/lib/logging"
 import exec, execFormat from "novacbn/gmodproj/lib/utilities/fs"
 assertx = dependency "novacbn/gmodproj/lib/utilities/assert"
@@ -167,11 +166,6 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
 
             return readFileSync(path)
 
-        -- ChunkEnvironment::readDataFile(string path) -> table
-        -- Reads a DataFile-format file from disk into memory
-        -- scripting, safe
-        readDataFile: (path) -> fromString(environmentTable.read(path))
-
         -- ChunkEnvironment::readJSON(string path) -> table
         -- Reads a JSON-format file from disk into memory
         -- scripting, safe
@@ -226,11 +220,6 @@ ChunkEnvironment = (environmentRoot, allowUnsafe) ->
 
             writeFileSync(path, contents)
             return nil
-
-        -- ChunkEnvironment::writeDataFile(string path, table tableData) -> void
-        -- Writes to a DataFile-format file on disk
-        -- scripting, safe
-        writeDataFile: (path, tableData) -> environmentTable.write(path, toString(tableData))
 
         -- ChunkEnvironment::writeJSON(string path, table tableData) -> void
         -- Writes to a JSON-format file on disk

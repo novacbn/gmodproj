@@ -32,26 +32,29 @@ TemplateRegister = () -> {
         @registeredTemplates[name] = template
 }
 
--- ::formatDescription(table flags) -> string
--- Formats the help description of the command
+-- ::TEXT_COMMAND_DESCRIPTION -> string
+-- Represents the description of the command
 -- export
-export formatDescription = (flags) ->
-    -- Load the default plugins and register their templates
-    templateRegister    = TemplateRegister()
-    pluginManager       = PluginManager\new(MAP_DEFAULT_PLUGINS)
-    pluginManager\dispatchEvent("registerTemplates", templateRegister)
+export TEXT_COMMAND_DESCRIPTION = "Initializes a new project using a project template"
 
-    -- Format the registered templates into a friendly display string
-    templateNames = ["'"..templateName.."'" for templateName, template in pairs(templateRegister.registeredTemplates)]
-    sort(templateNames)
-    templateNames = concat(templateNames, ", ")
+-- ::TEXT_COMMAND_SYNTAX -> string
+-- Represents the syntax of the command
+-- export
+export TEXT_COMMAND_SYNTAX = "<template> <author> <name>"
 
-    return "new <template> <author> <name>\t\tCreates a new directory for your project via a template\n\t\t\t\t\t\t\t#{templateNames}"
+-- ::TEXT_COMMAND_EXAMPLES -> string
+-- Represents the examples of the command
+-- export
+export TEXT_COMMAND_EXAMPLES = {
+    "addon novacbn my-addon"
+    "gamemode novacbn my-gamemode"
+    "package novacbn package"
+}
 
--- ::executeCommand(table flags, string template, string author, string name, string ...) -> void
+-- ::executeCommand(Options options, string template, string author, string name, string ...) -> void
 -- Creates the new project directory under the current working directory
 -- export
-export executeCommand = (flags, templateName, author, name, ...) ->
+export executeCommand = (options, templateName, author, name, ...) ->
     -- Load the default plugins and register their templates
     templateRegister    = TemplateRegister()
     pluginManager       = PluginManager\new(MAP_DEFAULT_PLUGINS)

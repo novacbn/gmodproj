@@ -1,8 +1,4 @@
-import join from require "path"
-
 import Schema from "novacbn/gmodproj/api/Schema"
-
-import PROJECT_PATH from "novacbn/gmodproj/lib/constants"
 
 -- ResolverOptions::ResolverOptions()
 -- Represents the LIVR schema for validating 'Resolver' section in 'manifest.gmodproj'
@@ -25,7 +21,7 @@ export ResolverOptions = Schema\extend {
     --
     default: {
         searchPaths: {
-            join(PROJECT_PATH.home, "packages")
+            "packages"
         }
     }
 }
