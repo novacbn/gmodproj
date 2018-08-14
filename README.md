@@ -1,11 +1,11 @@
 # gmodproj
 [![Build status](https://ci.appveyor.com/api/projects/status/8p7qgdoxvt7smodx?svg=true)](https://ci.appveyor.com/project/novacbn/gmodproj) [![Build Status](https://travis-ci.org/novacbn/gmodproj.svg)](https://travis-ci.org/novacbn/gmodproj)
 
-## Hiatus
-Project is currently on hiatus for the near future.
-
 **[Releases](https://github.com/novacbn/gmodproj/releases) &bullet;**
 A simple to get started, but easy to hack, project manager for Garry's Mod
+
+## Hiatus
+Project is currently on hiatus for the near future.
 
 ## Current Status
 `gmodproj` is currently in `pre-alpha`, and is recommended only for experimentation and testing purposes only! So keep this in mind:
